@@ -6155,7 +6155,49 @@ async function renderAdminAccounts() {
     `;
     const stat = document.getElementById('adminAccountsCount'); if (stat) stat.textContent = rows.length;
 }
+async function toggleSellerStatus(sellerId) {
+    try {
+        const seller = sellers.find(s => s.sellerId === sellerId);
 
+        if (!seller) {
+            showToast('Seller not found.');
+            return;
+        }
+
+        const newStatus =
+            seller.status === 'active'
+                ? 'inactive'
+                : 'active';
+
+        const sellerDocId =
+            seller.firestoreId || seller.id;
+
+        if (!sellerDocId) {
+            showToast('Seller record ID not found.');
+            return;
+        }
+
+        await updateDoc(
+            doc(nearbuyFirebase.db, 'sellers', sellerDocId),
+            {
+                status: newStatus,
+                updatedAt: new Date().toISOString()
+            }
+        );
+
+        showToast(
+            newStatus === 'active'
+                ? 'Seller account activated.'
+                : 'Seller account deactivated.'
+        );
+
+        await renderAdminSellers();
+
+    } catch (error) {
+        console.error('Error changing seller status:', error);
+        showToast('Unable to update seller status.');
+    }
+}
 async function renderAdminSellers() {
     const container = document.getElementById('adminContent');
     if (!container) return;
@@ -6193,6 +6235,20 @@ function renderSellerAdminCard(s) {
                 <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:12px;">
                     <button type="button" onclick="copySellerLink('${sellerId}')" style="padding:8px 11px;border:0;border-radius:8px;cursor:pointer;"><i class="fas fa-copy"></i> Copy Link</button>
                     <button type="button" class="btn-primary" onclick="openSellerLink('${sellerId}')" style="padding:8px 11px;width:auto;"><i class="fas fa-store"></i> Open Page</button>
+                    <button
+    type="button"
+    class="btn-primary"
+    onclick="toggleSellerStatus('${seller.sellerId}')"
+    style="
+        padding:8px 12px;
+        width:auto;
+        background:${seller.status === 'active' ? '#dc3545' : '#198754'};
+    "
+>
+    ${seller.status === 'active'
+        ? 'Deactivate'
+        : 'Activate'}
+</button>
                 </div>
             </div>
         </div>`;
