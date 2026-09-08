@@ -4,10 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
     <title>NearBuy — Buy. Sell. Support Local.</title>
-    <link
-    rel="icon"
-    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23138e97'/%3E%3Ctext x='32' y='40' text-anchor='middle' font-family='Arial,sans-serif' font-size='24' font-weight='700' fill='white'%3ENB%3C/text%3E%3C/svg%3E"
->
     <link rel="icon" href="data:,">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
@@ -2027,7 +2023,7 @@ window.nearbuyStartTracking =
         <div class="header-left">
             <div class="logo">Near<span>Buy</span></div>
             <div class="location-badge">
-                <i class="fas fa-map-pin"></i> Crawford, ogun state  <i class="fas fa-chevron-down"></i>
+                <i class="fas fa-map-pin"></i> Unilag, Lagos <i class="fas fa-chevron-down"></i>
             </div>
         </div>
         <div class="header-actions">
@@ -2089,7 +2085,7 @@ window.nearbuyStartTracking =
     <!-- HOME -->
     <div id="page-home" class="page">
         <div class="section-title">
-            <span>Trending in Crawford</span>
+            <span>Trending in Unilag</span>
             <a href="#" onclick="showPage('categories')">See all</a>
         </div>
         <div class="product-grid" id="productGrid">
@@ -3072,7 +3068,7 @@ window.nearbuyStartTracking =
                 <button>0</button>
                 <button><i class="fas fa-delete-left"></i></button>
             </div>
-            <p style="margin-top:16px;font-size:12px;color:var(--text-muted);"></p>
+            <p style="margin-top:16px;font-size:12px;color:var(--text-muted);">Default PIN: 123456</p>
         </div>
     </div>
 
@@ -6155,49 +6151,7 @@ async function renderAdminAccounts() {
     `;
     const stat = document.getElementById('adminAccountsCount'); if (stat) stat.textContent = rows.length;
 }
-async function toggleSellerStatus(sellerId) {
-    try {
-        const seller = sellers.find(s => s.sellerId === sellerId);
 
-        if (!seller) {
-            showToast('Seller not found.');
-            return;
-        }
-
-        const newStatus =
-            seller.status === 'active'
-                ? 'inactive'
-                : 'active';
-
-        const sellerDocId =
-            seller.firestoreId || seller.id;
-
-        if (!sellerDocId) {
-            showToast('Seller record ID not found.');
-            return;
-        }
-
-        await updateDoc(
-            doc(nearbuyFirebase.db, 'sellers', sellerDocId),
-            {
-                status: newStatus,
-                updatedAt: new Date().toISOString()
-            }
-        );
-
-        showToast(
-            newStatus === 'active'
-                ? 'Seller account activated.'
-                : 'Seller account deactivated.'
-        );
-
-        await renderAdminSellers();
-
-    } catch (error) {
-        console.error('Error changing seller status:', error);
-        showToast('Unable to update seller status.');
-    }
-}
 async function renderAdminSellers() {
     const container = document.getElementById('adminContent');
     if (!container) return;
@@ -6216,9 +6170,11 @@ function renderSellerAdminCard(s) {
     const photo = isRealNearbuyImage(s.photo)
         ? `<img class="seller-avatar" src="${escapeHTML(s.photo)}" alt="Seller profile">`
         : `<div class="seller-avatar empty"><i class="fas fa-store"></i></div>`;
+
     const sellerId = s.sellerId || s.id || '';
-    const status = s.status || 'active';
+    const status = s.status === 'inactive' ? 'inactive' : 'active';
     const statusText = status === 'active' ? 'Active' : 'Inactive';
+
     return `
         <div class="admin-order" style="margin-bottom:12px;">
             <div class="info" style="width:100%;">
@@ -6232,26 +6188,92 @@ function renderSellerAdminCard(s) {
                         <span style="display:inline-block;margin-top:5px;padding:4px 8px;border-radius:20px;font-size:11px;background:${status === 'active' ? '#e8f7ef' : '#fbeaea'};color:${status === 'active' ? '#16794c' : '#a33a3a'};">${statusText}</span>
                     </div>
                 </div>
+
                 <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:12px;">
-                    <button type="button" onclick="copySellerLink('${sellerId}')" style="padding:8px 11px;border:0;border-radius:8px;cursor:pointer;"><i class="fas fa-copy"></i> Copy Link</button>
-                    <button type="button" class="btn-primary" onclick="openSellerLink('${sellerId}')" style="padding:8px 11px;width:auto;"><i class="fas fa-store"></i> Open Page</button>
                     <button
-    type="button"
-    class="btn-primary"
-   onclick="toggleSellerStatus('${s.sellerId}')"
-    style="
-        padding:8px 12px;
-        width:auto;
-        background:${seller.status === 'active' ? '#dc3545' : '#198754'};
-    "
->
-    ${seller.status === 'active'
-        ? 'Deactivate'
-        : 'Activate'}
-</button>
+                        type="button"
+                        onclick="copySellerLink('${sellerId}')"
+                        style="padding:8px 11px;border:0;border-radius:8px;cursor:pointer;"
+                    >
+                        <i class="fas fa-copy"></i> Copy Link
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn-primary"
+                        onclick="openSellerLink('${sellerId}')"
+                        style="padding:8px 11px;width:auto;"
+                    >
+                        <i class="fas fa-store"></i> Open Page
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn-primary"
+                        onclick="toggleSellerStatus('${sellerId}')"
+                        style="
+                            padding:8px 12px;
+                            width:auto;
+                            background:${status === 'active' ? '#dc3545' : '#198754'};
+                        "
+                    >
+                        ${status === 'active' ? 'Deactivate' : 'Activate'}
+                    </button>
                 </div>
             </div>
         </div>`;
+}
+
+async function toggleSellerStatus(sellerId) {
+    const seller = sellers.find(s => String(s.sellerId || s.id || '') === String(sellerId));
+
+    if (!seller) {
+        showToast('Seller not found.');
+        return;
+    }
+
+    const currentStatus = seller.status === 'inactive' ? 'inactive' : 'active';
+    const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+    const actionText = newStatus === 'inactive' ? 'deactivate' : 'activate';
+
+    if (!confirm(`Are you sure you want to ${actionText} ${seller.name || 'this seller'}?`)) {
+        return;
+    }
+
+    const firestoreId = seller.firestoreId;
+
+    if (!firestoreId) {
+        showToast('Seller Firestore record ID not found.');
+        return;
+    }
+
+    try {
+        await window.nearbuyFirebase.updateDoc(
+            window.nearbuyFirebase.doc(
+                window.nearbuyFirebase.db,
+                'sellers',
+                firestoreId
+            ),
+            {
+                status: newStatus,
+                updatedAt: new Date().toISOString()
+            }
+        );
+
+        seller.status = newStatus;
+        seller.updatedAt = new Date().toISOString();
+
+        showToast(
+            newStatus === 'active'
+                ? 'Seller account activated.'
+                : 'Seller account deactivated.'
+        );
+
+        await renderAdminSellers();
+    } catch (error) {
+        console.error('Failed to update seller status:', error);
+        showToast('Could not update seller account status.');
+    }
 }
 
 function openAddSellerForm() {
