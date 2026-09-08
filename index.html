@@ -4,10 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
     <title>NearBuy — Buy. Sell. Support Local.</title>
-    <link rel="icon" href="data:,">
      <link
     rel="icon"
     href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23138e97'/%3E%3Ctext x='32' y='40' text-anchor='middle' font-family='Arial,sans-serif' font-size='24' font-weight='700' fill='white'%3ENB%3C/text%3E%3C/svg%3E">
+    <link rel="icon" href="data:,">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
      <script src="https://js.paystack.co/v2/inline.js"></script>
@@ -15,7 +15,7 @@
 
     // ============================================================
     // NEARBUY FIREBASE SETUP
-    // ============================================================
+    // ============================================================   
 
     // Import Firebase App
     import { initializeApp }
@@ -1732,23 +1732,27 @@ window.nearbuyStartTracking =
 
 
 .profile-logo-circle {
-    width: 60px;
-    height: 60px;
+    width: 38px;
+    height: 38px;
+
     border-radius: 50%;
-    overflow: hidden;
+
+    background: #fff;
+
+    border: 1px solid var(--border);
+
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #f5f1e8;
-    flex-shrink: 0;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    color: var(--primary);
 }
 
-.profile-logo-circle img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}.profile-brand-text {
+
+.profile-brand-text {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -2022,7 +2026,7 @@ window.nearbuyStartTracking =
         <div class="header-left">
             <div class="logo">Near<span>Buy</span></div>
             <div class="location-badge">
-                <i class="fas fa-map-pin"></i> Crawford,Ogun,state <i class="fas fa-chevron-down"></i>
+                <i class="fas fa-map-pin"></i> Unilag, Lagos <i class="fas fa-chevron-down"></i>
             </div>
         </div>
         <div class="header-actions">
@@ -2084,7 +2088,7 @@ window.nearbuyStartTracking =
     <!-- HOME -->
     <div id="page-home" class="page">
         <div class="section-title">
-            <span>Trending in Crawford</span>
+            <span>Trending in Unilag</span>
             <a href="#" onclick="showPage('categories')">See all</a>
         </div>
         <div class="product-grid" id="productGrid">
@@ -2210,9 +2214,9 @@ window.nearbuyStartTracking =
         <!-- NearBuy Logo -->
         <div class="profile-login-brand">
 
-           <div className="profile-logo-circle">
-    <img src="/nearbuy-logo.jpg" alt="NearBuy Logo" />
-</div>
+            <div class="profile-login-logo">
+                NB
+            </div>
 
             <div class="profile-login-brand-text">
 
@@ -2283,9 +2287,9 @@ window.nearbuyStartTracking =
         <!-- NearBuy Logo -->
         <div class="profile-brand">
 
-            <div className="profile-logo-circle">
-    <img src="/nearbuy-logo.jpg" alt="NearBuy Logo" />
-</div>
+            <div class="profile-logo-circle">
+                NB
+            </div>
 
             <div class="profile-brand-text">
 
@@ -2766,7 +2770,6 @@ window.nearbuyStartTracking =
                     type="file"
                     id="paymentReceipt"
                     accept="image/*,.pdf"
-                    required
                 />
 
                 <small style="
@@ -3067,7 +3070,7 @@ window.nearbuyStartTracking =
                 <button>0</button>
                 <button><i class="fas fa-delete-left"></i></button>
             </div>
-            <p style="margin-top:16px;font-size:12px;color:var(--text-muted);"></p>
+            <p style="margin-top:16px;font-size:12px;color:var(--text-muted);">Default PIN: 123456</p>
         </div>
     </div>
 
@@ -4280,444 +4283,169 @@ function updateCheckoutTotals() {
 // NEARBUY PRODUCT PAYMENT — PAYSTACK
 // ============================================================
 
-function startProductPayment() {
-
-    // --------------------------------------------------------
-    // 1. CHECK CART
-    // --------------------------------------------------------
+async function startProductPayment() {
 
     if (!cart || cart.length === 0) {
-
         showToast('Cart is empty');
-
         return;
     }
 
-
-    // --------------------------------------------------------
-    // 2. GET CHECKOUT DETAILS
-    // --------------------------------------------------------
-
-    const email =
-        document.getElementById('checkoutEmail')?.value.trim();
-
-    const state =
-        document.getElementById('deliveryState')?.value;
-
-    const lga =
-        document.getElementById('deliveryLGA')?.value.trim();
-
-    const address =
-        document.getElementById('deliveryAddress')?.value.trim();
-
-    const phone =
-        document.getElementById('deliveryPhone')?.value.trim();
-
-    const note =
-        document.getElementById('deliveryNote')?.value.trim() || '';
-
-
-    // --------------------------------------------------------
-    // 3. VALIDATE REQUIRED INFORMATION
-    // --------------------------------------------------------
+    const email = document.getElementById('checkoutEmail')?.value.trim();
+    const state = document.getElementById('deliveryState')?.value;
+    const lga = document.getElementById('deliveryLGA')?.value.trim();
+    const address = document.getElementById('deliveryAddress')?.value.trim();
+    const phone = document.getElementById('deliveryPhone')?.value.trim();
+    const note = document.getElementById('deliveryNote')?.value.trim() || '';
 
     if (!email) {
-
         showToast('Please enter your email address');
-
         return;
     }
-
-
     if (!lga) {
-
         showToast('Please enter your LGA / Area');
-
         return;
     }
-
-
     if (!address) {
-
         showToast('Please enter your delivery address');
-
         return;
     }
-
-
     if (!phone) {
-
         showToast('Please enter your phone number');
-
         return;
     }
 
-
-    // --------------------------------------------------------
-    // 4. CHECK RECEIPT
-    // --------------------------------------------------------
-
-    const receiptInput =
-        document.getElementById('paymentReceipt');
-
-    const receiptFile =
-        receiptInput?.files?.[0];
-
-
-    if (!receiptFile) {
-
-        showToast(
-            'Please upload your payment receipt'
-        );
-
+    if (typeof PaystackPop === 'undefined') {
+        showToast('Paystack payment system is not available.');
+        console.error('PaystackPop was not loaded.');
         return;
     }
 
+    const subtotal = cart.reduce(
+        (sum, item) => sum + (Number(item.price) * Number(item.qty)),
+        0
+    );
 
-    // --------------------------------------------------------
-    // 5. CALCULATE SUBTOTAL
-    // --------------------------------------------------------
+    const totalQuantity = cart.reduce(
+        (sum, item) => sum + Number(item.qty),
+        0
+    );
 
-    const subtotal =
-        cart.reduce(
-            (sum, item) =>
-                sum + (Number(item.price) * Number(item.qty)),
-            0
-        );
+    const serviceFee = totalQuantity * 100;
+    const delivery = state === 'Lagos' ? 1500 : 3500;
+    const total = subtotal + serviceFee + delivery;
 
-
-    // --------------------------------------------------------
-    // 6. NEARBUY SERVICE CHARGE
-    // ₦100 FOR EACH UNIT PURCHASED
-    // --------------------------------------------------------
-
-    const totalQuantity =
-        cart.reduce(
-            (sum, item) =>
-                sum + Number(item.qty),
-            0
-        );
-
-
-    const serviceFee =
-        totalQuantity * 100;
-
-
-    // --------------------------------------------------------
-    // 7. DELIVERY FEE
-    // --------------------------------------------------------
-
-    const delivery =
-        state === 'Lagos'
-            ? 1500
-            : 3500;
-
-
-    // --------------------------------------------------------
-    // 8. FINAL TOTAL
-    // --------------------------------------------------------
-
-    const total =
-        subtotal +
-        serviceFee +
-        delivery;
-
-
-    // --------------------------------------------------------
-    // 9. CHECK PAYSTACK
-    // --------------------------------------------------------
-
-    if (
-        typeof PaystackPop === 'undefined'
-    ) {
-
-        showToast(
-            'Paystack payment system is not available.'
-        );
-
-        console.error(
-            'PaystackPop was not loaded.'
-        );
-
-        return;
-    }
-
-
-    // --------------------------------------------------------
-    // 10. DISABLE BUTTON
-    // --------------------------------------------------------
-
-    const paymentButton =
-        document.getElementById(
-            'paystackCheckoutButton'
-        );
-
-
+    const paymentButton = document.getElementById('paystackCheckoutButton');
     if (paymentButton) {
-
         paymentButton.disabled = true;
-
-        paymentButton.innerHTML =
-            '<i class="fas fa-spinner fa-spin"></i> Opening Paystack...';
-
+        paymentButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing secure payment...';
     }
 
-
-    // --------------------------------------------------------
-    // 11. CREATE PAYMENT REFERENCE
-    // --------------------------------------------------------
-
-    const paymentReference =
-        'NB-' +
-        Date.now() +
-        '-' +
-        Math.floor(
-            Math.random() * 10000
-        );
-
-
-    // --------------------------------------------------------
-    // 12. SAVE REFERENCE TO CHECKOUT
-    // --------------------------------------------------------
-
-    const referenceInput =
-        document.getElementById('paymentRef');
-
-
-    if (referenceInput) {
-
-        referenceInput.value =
-            paymentReference;
-
-    }
-
-
-    // --------------------------------------------------------
-    // 13. OPEN PAYSTACK
-    // --------------------------------------------------------
-
-    const handler =
-        PaystackPop.setup({
-
-            // =================================================
-            // REPLACE THIS WITH YOUR PAYSTACK TEST PUBLIC KEY
-            // =================================================
-
-            key: 'pk_test_d7492063236f3c760910c684f67bab5d9b3aa1a3',
-
-            email: email,
-
-            amount:
-                total * 100,
-
-            currency: 'NGN',
-
-            ref:
-                paymentReference,
-
-
-            metadata: {
-
-                custom_fields: [
-
-                    {
-                        display_name:
-                            'NEARBUY Service Charge',
-
-                        variable_name:
-                            'nearbuy_service_charge',
-
-                        value:
-                            `₦${serviceFee.toLocaleString()}`
-                    },
-
-                    {
-                        display_name:
-                            'Total Quantity',
-
-                        variable_name:
-                            'total_quantity',
-
-                        value:
-                            String(totalQuantity)
-                    },
-
-                    {
-                        display_name:
-                            'Delivery State',
-
-                        variable_name:
-                            'delivery_state',
-
-                        value:
-                            state
-                    }
-
-                ]
-
-            },
-
-
-            // =================================================
-            // PAYMENT SUCCESS
-            // =================================================
-
-           callback:
-    async function(response) {
-
-                    console.log(
-                        'Paystack payment completed:',
-                        response.reference
-                    );
-
-
-                    // Save the reference
-                    // We will verify this securely
-                    // from the backend/Firebase later.
-
-                    const order = {
-
-                        id:
-                            `NB-${++orderCounter}`,
-
-                        items:
-                            [...cart],
-
-                        subtotal:
-                            subtotal,
-
-                        serviceFee:
-                            serviceFee,
-
-                        delivery:
-                            delivery,
-
-                        total:
-                            total,
-
-                        email:
-                            email,
-
-                        state:
-                            state,
-
-                        lga:
-                            lga,
-
-                        address:
-                            address,
-
-                        phone:
-                            phone,
-
-                        userPhone:
-                            normalizeNearbuyPhone(phone),
-
-                        userName:
-                            getCurrentUserName(),
-
-                        note:
-                            note,
-
-                        ref:
-                            response.reference,
-
-                        status:
-                            'Payment Pending Verification',
-
-                        date:
-                            new Date()
-                                .toISOString()
-                                .split('T')[0]
-
-                    };
-
-
-                    // ------------------------------------------------
-                    // TEMPORARY LOCAL ORDER
-                    // ------------------------------------------------
-                    // Firebase will replace this later.
-try {
-
-    await window.nearbuySaveOrder(order);
-
-    console.log(
-        ' NEARBUY order saved to Firestore successfully!'
-    );
-
-    // Remember this exact order
-    setUserCurrentOrderId(order.id);
-console.log(
-    ' NEARBUY order saved to Firestore successfully!'
-);
-} catch (error) {
-
-    console.error(
-        ' Order could not be saved to Firestore:',
-        error
-    );
-
-    showToast(
-        'Payment received, but we could not save your order. Please contact NEARBUY support.'
-    );
-
-    return;
-}
-
-                    // Clear cart
-
-                    cart = [];
-
-                    updateCartUI();
-
-
-                    showToast(
-                        ' Payment completed! Your order is being processed.'
-                    );
-
-
-             showPage('tracking');
-
-updateTracking(
-    order.id
-);
-
-nearbuyRefreshTracking(
-    order.id
-);
-
-                },
-
-
-            // =================================================
-            // PAYMENT WINDOW CLOSED
-            // =================================================
-
-            onClose:
-                function() {
-
-                    showToast(
-                        'Payment window closed.'
-                    );
-
-
-                    if (paymentButton) {
-
-                        paymentButton.disabled = false;
-
-                        paymentButton.innerHTML =
-                            '<i class="fas fa-lock"></i> Pay with Paystack';
-
-                    }
-
-                }
-
+    try {
+        // The backend creates the Paystack transaction. The secret key NEVER
+        // reaches this browser.
+        const initializeResponse = await fetch('/api/paystack-initialize', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email,
+                amount: total,
+                currency: 'NGN',
+                userPhone: normalizeNearbuyPhone(phone),
+                userName: getCurrentUserName(),
+                state,
+                lga,
+                address,
+                note,
+                items: cart.map(item => ({
+                    id: item.id,
+                    productId: item.productId || item.id,
+                    name: item.name,
+                    price: Number(item.price),
+                    qty: Number(item.qty),
+                    sellerId: item.sellerId || '',
+                    sellerName: item.sellerName || ''
+                })),
+                subtotal,
+                serviceFee,
+                delivery,
+                total,
+                orderId: `NB-${Date.now()}-${Math.floor(Math.random() * 10000)}`
+            })
         });
 
+        const initializeData = await initializeResponse.json();
 
-    handler.openIframe();
+        if (!initializeResponse.ok || !initializeData.status) {
+            throw new Error(initializeData.message || 'Unable to initialize Paystack payment.');
+        }
 
+        const paymentReference = initializeData.data.reference;
+        const accessCode = initializeData.data.access_code;
+        const orderId = initializeData.data.orderId;
+
+        const referenceInput = document.getElementById('paymentRef');
+        if (referenceInput) referenceInput.value = paymentReference;
+
+        // The backend has already created the pending order.
+        // Store only the order ID locally so the buyer can track it.
+        setUserCurrentOrderId(orderId);
+
+        // Paystack V2: the transaction is initialized on our backend,
+        // then resumed in the browser using the returned access code.
+        const popup = new PaystackPop();
+        popup.resumeTransaction(accessCode);
+
+        // The webhook is the source of truth. We also verify from the browser
+        // for a fast UX update while the webhook processes in the background.
+        let verificationAttempts = 0;
+        const verificationTimer = setInterval(async function () {
+            verificationAttempts += 1;
+
+            try {
+                const verifyResponse = await fetch(
+                    `/api/paystack-verify?reference=${encodeURIComponent(paymentReference)}`
+                );
+                const verifyData = await verifyResponse.json();
+
+                if (verifyResponse.ok && verifyData.status && verifyData.data?.status === 'success') {
+                    clearInterval(verificationTimer);
+
+                    showToast('Payment confirmed! Your order is being processed.');
+                    cart = [];
+                    updateCartUI();
+                    showPage('tracking');
+                    updateTracking(orderId);
+                    nearbuyRefreshTracking(orderId);
+
+                    if (paymentButton) {
+                        paymentButton.disabled = false;
+                        paymentButton.innerHTML = '<i class="fas fa-lock"></i> Pay with Paystack';
+                    }
+                }
+            } catch (verifyError) {
+                console.warn('Paystack verification check failed:', verifyError);
+            }
+
+            if (verificationAttempts >= 40) {
+                clearInterval(verificationTimer);
+                if (paymentButton) {
+                    paymentButton.disabled = false;
+                    paymentButton.innerHTML = '<i class="fas fa-lock"></i> Pay with Paystack';
+                }
+                showToast('Payment is still being verified. Please check your order status shortly.');
+            }
+        }, 3000);
+
+    } catch (error) {
+        console.error('Secure Paystack initialization failed:', error);
+        showToast(error.message || 'Could not start secure payment. Please try again.');
+        if (paymentButton) {
+            paymentButton.disabled = false;
+            paymentButton.innerHTML = '<i class="fas fa-lock"></i> Pay with Paystack';
+        }
+    }
 }
+
         // ============================================================
         // ORDER TRACKING
         // ============================================================
