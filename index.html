@@ -1732,27 +1732,23 @@ window.nearbuyStartTracking =
 
 
 .profile-logo-circle {
-    width: 38px;
-    height: 38px;
-
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
-
-    background: #fff;
-
-    border: 1px solid var(--border);
-
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-
-    font-size: 10px;
-    font-weight: 700;
-
-    color: var(--primary);
+    background: #f5f1e8;
+    flex-shrink: 0;
 }
 
-
-.profile-brand-text {
+.profile-logo-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}.profile-brand-text {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -2287,9 +2283,9 @@ window.nearbuyStartTracking =
         <!-- NearBuy Logo -->
         <div class="profile-brand">
 
-            <div class="profile-logo-circle">
-                NB
-            </div>
+            <div className="profile-logo-circle">
+    <img src="/nearbuy-logo.jpg" alt="NearBuy Logo" />
+</div>
 
             <div class="profile-brand-text">
 
