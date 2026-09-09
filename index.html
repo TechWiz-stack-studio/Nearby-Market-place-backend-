@@ -4,9 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
     <title>NearBuy — Buy. Sell. Support Local.</title>
-     <link
-    rel="icon"
-    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23138e97'/%3E%3Ctext x='32' y='40' text-anchor='middle' font-family='Arial,sans-serif' font-size='24' font-weight='700' fill='white'%3ENB%3C/text%3E%3C/svg%3E">
     <link rel="icon" href="data:,">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
@@ -15,7 +12,7 @@
 
     // ============================================================
     // NEARBUY FIREBASE SETUP
-    // ============================================================   
+    // ============================================================
 
     // Import Firebase App
     import { initializeApp }
@@ -31,6 +28,8 @@
     collection,
     addDoc,
     getDocs,
+    getDoc,
+    setDoc,
     updateDoc,
     deleteDoc,
     doc,
@@ -99,6 +98,8 @@ window.nearbuyFirebase = {
     addDoc,
     collection,
     getDocs,
+    getDoc,
+    setDoc,
     updateDoc,
     deleteDoc,
     doc,
@@ -112,32 +113,13 @@ window.nearbuySaveOrder = async function(order) {
 console.log(" nearbuySaveOrder was called", order);
     try {
 
-        const createdAt = new Date().toISOString();
         const orderRef = await addDoc(
             collection(db, "orders"),
             {
                 ...order,
-                createdAt
+                createdAt: new Date().toISOString()
             }
         );
-
-        // Notify each seller represented in the order.
-        const sellerIds = [...new Set((order.items || []).map(item => item.sellerId).filter(Boolean).map(String))];
-        for (const sellerId of sellerIds) {
-            try {
-                await addDoc(collection(db, "notifications"), {
-                    sellerId,
-                    title: "New order received",
-                    message: `Order #${order.id} contains item(s) from your store.`,
-                    type: "order",
-                    read: false,
-                    orderId: order.id,
-                    createdAt
-                });
-            } catch (notificationError) {
-                console.warn("Seller notification could not be saved:", notificationError);
-            }
-        }
 
         console.log(
             " Order saved to Firestore:",
@@ -2014,7 +1996,269 @@ window.nearbuyStartTracking =
     color:var(--text-muted);
 }
 
-    </style>
+    
+
+</style>
+
+<style id="nearbuy-integrated-seller-styles">
+.seller-shell :root{--teal:#138e97;--teal-dark:#0c6f76;--orange:#f29b38;--bg:#faf8f5;--card:#fff;--text:#1d2528;--muted:#727b7e;--border:#e6e3df;--danger:#c84444;--success:#197a52;--shadow:0 10px 28px rgba(22,32,35,.08);--radius:16px}.seller-shell *{box-sizing:border-box}.seller-shell{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Arial,sans-serif}.seller-shell .app{max-width:1100px;margin:auto;min-height:100vh}.seller-shell .topbar{position:sticky;top:0;z-index:20;background:rgba(250,248,245,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}.seller-shell .brand{display:flex;align-items:center;gap:10px}.seller-shell .brand-mark{width:40px;height:40px;border-radius:12px;background:var(--teal);color:#fff;display:grid;place-items:center}.seller-shell .brand strong{font-size:18px}.seller-shell .brand small{display:block;color:var(--muted);font-size:11px;margin-top:2px}.seller-shell .top-actions{display:flex;gap:8px}.seller-shell .icon-btn,.seller-shell .back-btn{border:1px solid var(--border);background:#fff;width:40px;height:40px;border-radius:12px;cursor:pointer;color:var(--text)}.seller-shell main{padding:20px}.seller-shell .screen{display:none}.seller-shell .screen.active{display:block}.seller-shell .login-wrap{min-height:calc(100vh - 100px);display:grid;place-items:center}.seller-shell .login-card{width:min(440px,100%);background:var(--card);border:1px solid var(--border);border-radius:22px;padding:28px;box-shadow:var(--shadow)}.seller-shell .login-logo{width:58px;height:58px;border-radius:17px;background:var(--teal);color:#fff;display:grid;place-items:center;font-size:24px;margin-bottom:18px}.seller-shell .login-card h1{margin:0 0 7px;font-size:25px}.seller-shell .login-card p{color:var(--muted);font-size:14px;line-height:1.5}.seller-shell .field{margin-top:15px}.seller-shell .field label{display:block;font-size:13px;font-weight:700;margin-bottom:7px}.seller-shell .field input,.seller-shell .field textarea,.seller-shell .field select{width:100%;border:1px solid var(--border);background:#fff;border-radius:12px;padding:12px 13px;font:inherit;outline:none}.seller-shell .field input:focus,.seller-shell .field textarea:focus,.seller-shell .field select:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(19,142,151,.1)}.seller-shell .btn{border:0;border-radius:12px;padding:12px 15px;font:inherit;font-weight:700;cursor:pointer}.seller-shell .btn-primary{background:var(--teal);color:#fff}.seller-shell .btn-primary:hover{background:var(--teal-dark)}.seller-shell .btn-light{background:#f1f0ed;color:var(--text)}.seller-shell .btn-danger{background:#fff0f0;color:var(--danger)}.seller-shell .btn-small{padding:8px 10px;font-size:12px}.seller-shell .pin-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}.seller-shell .pin-row input{text-align:center;font-size:20px;font-weight:700}.seller-shell .error{background:#fff0f0;color:#a33a3a;padding:10px 12px;border-radius:10px;font-size:13px;margin-top:12px;display:none}.seller-shell .dashboard-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:18px}.seller-shell .dashboard-head h1{font-size:25px;margin:0 0 5px}.seller-shell .dashboard-head p{margin:0;color:var(--muted);font-size:13px}.seller-shell .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}.seller-shell .stat{background:#fff;border:1px solid var(--border);border-radius:15px;padding:16px;box-shadow:0 5px 18px rgba(22,32,35,.04)}.seller-shell .stat .num{font-size:23px;font-weight:800}.seller-shell .stat .label{font-size:12px;color:var(--muted);margin-top:4px}.seller-shell .tabs{display:flex;gap:7px;overflow:auto;padding-bottom:5px;margin-bottom:16px}.seller-shell .tab{white-space:nowrap;border:1px solid var(--border);background:#fff;border-radius:11px;padding:9px 12px;font-size:12px;font-weight:700;cursor:pointer}.seller-shell .tab.active{background:var(--teal);color:#fff;border-color:var(--teal)}.seller-shell .panel{background:#fff;border:1px solid var(--border);border-radius:17px;padding:17px;box-shadow:0 5px 18px rgba(22,32,35,.04)}.seller-shell .panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}.seller-shell .panel-head h2{font-size:17px;margin:0}.seller-shell .product-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.seller-shell .product{border:1px solid var(--border);border-radius:14px;overflow:hidden;background:#fff}.seller-shell .product img{width:100%;height:160px;object-fit:cover;background:#f0efec}.seller-shell .product-body{padding:12px}.seller-shell .product h3{font-size:14px;margin:0 0 6px}.seller-shell .price{font-weight:800;color:var(--teal);font-size:14px}.seller-shell .meta{font-size:11px;color:var(--muted);margin-top:5px}.seller-shell .actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.seller-shell .empty{padding:35px 15px;text-align:center;color:var(--muted);font-size:13px}.seller-shell .order{border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px}.seller-shell .order:last-child{margin-bottom:0}.seller-shell .order-top{display:flex;justify-content:space-between;gap:10px}.seller-shell .order-id{font-weight:800;font-size:14px}.seller-shell .badge{display:inline-flex;padding:5px 8px;border-radius:20px;font-size:10px;font-weight:700;background:#edf6f3;color:var(--success)}.seller-shell .order-items{margin-top:10px;background:#faf9f7;border-radius:10px;padding:9px}.seller-shell .order-item{display:flex;justify-content:space-between;gap:10px;font-size:12px;padding:4px 0}.seller-shell .chat-layout{display:grid;grid-template-columns:280px 1fr;gap:12px;min-height:520px}.seller-shell .rooms{border:1px solid var(--border);border-radius:14px;overflow:auto;background:#fff}.seller-shell .room{padding:12px;border-bottom:1px solid var(--border);cursor:pointer}.seller-shell .room.active{background:#eef9f8}.seller-shell .room strong{font-size:12px;display:block}.seller-shell .room small{font-size:10px;color:var(--muted)}.seller-shell .chat-box{border:1px solid var(--border);border-radius:14px;background:#fff;display:flex;flex-direction:column;min-height:520px}.seller-shell .chat-head{padding:13px;border-bottom:1px solid var(--border);font-weight:700;font-size:13px}.seller-shell .messages{flex:1;padding:13px;overflow:auto}.seller-shell .msg{max-width:75%;padding:9px 11px;border-radius:13px;background:#f0efec;margin-bottom:8px;font-size:12px;line-height:1.4}.seller-shell .msg.mine{margin-left:auto;background:#dff5f2}.seller-shell .msg small{display:block;color:var(--muted);font-size:9px;margin-top:3px}.seller-shell .chat-send{display:flex;gap:8px;padding:10px;border-top:1px solid var(--border)}.seller-shell .chat-send input{flex:1;border:1px solid var(--border);border-radius:11px;padding:10px}.seller-shell .notice{border:1px solid var(--border);border-radius:13px;padding:13px;margin-bottom:9px}.seller-shell .notice.unread{background:#f2fbfa;border-color:#cde9e5}.seller-shell .notice h3{font-size:13px;margin:0 0 5px}.seller-shell .notice p{font-size:12px;margin:0;color:#4e585b;line-height:1.45}.seller-shell .notice small{font-size:10px;color:var(--muted)}.seller-shell .profile-grid{display:grid;grid-template-columns:150px 1fr;gap:18px}.seller-shell .seller-photo{width:140px;height:140px;border-radius:18px;object-fit:cover;background:#f0efec}.seller-shell .seller-photo-empty{width:140px;height:140px;border-radius:18px;background:#eef5f4;display:grid;place-items:center;color:var(--teal);font-size:38px}.seller-shell .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:100;background:#222;color:#fff;padding:11px 15px;border-radius:10px;font-size:12px;display:none;max-width:90%;text-align:center}.seller-shell .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:50;display:none;align-items:center;justify-content:center;padding:18px}.seller-shell .modal.open{display:flex}.seller-shell .modal-card{width:min(520px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:19px;padding:18px}.seller-shell .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.seller-shell .modal-head h2{font-size:18px;margin:0}.seller-shell .close{border:0;background:#f1f0ed;border-radius:9px;width:34px;height:34px;cursor:pointer}.seller-shell .form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:15px}.seller-shell .preview{width:100%;max-height:190px;object-fit:cover;border-radius:12px;margin-top:8px;display:none}.seller-shell .locked{opacity:.65;pointer-events:none}@media(max-width:760px){.seller-shell main{padding:14px}.seller-shell .stats{grid-template-columns:repeat(2,1fr)}.seller-shell .product-grid{grid-template-columns:repeat(2,1fr)}.seller-shell .chat-layout{grid-template-columns:1fr}.seller-shell .rooms{max-height:180px}.seller-shell .profile-grid{grid-template-columns:1fr}.seller-shell .dashboard-head{flex-direction:column}}@media(max-width:480px){.seller-shell .product-grid{grid-template-columns:1fr}.seller-shell .topbar{padding:12px}.seller-shell .brand strong{font-size:16px}}
+
+</style>
+
+<style id="nearbuy-profile-redesign">
+/* ============================================================
+   NEARBUY PROFILE — MATCHED TO APPROVED DESIGN
+============================================================ */
+#page-profile{
+    background:#faf8f5;
+    min-height:100vh;
+}
+#page-profile .nb-profile-shell{
+    width:100%;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    padding:38px 20px 80px;
+}
+#page-profile .screen{
+    width:100%;
+    display:none;
+}
+#page-profile .screen:not(.hidden){
+    display:flex;
+    justify-content:center;
+}
+#page-profile .screen.hidden{display:none!important;}
+#page-profile .nb-profile-card{
+    width:min(568px,100%);
+    min-height:560px;
+    background:rgba(255,255,255,.78);
+    border:1px solid rgba(229,225,218,.8);
+    border-radius:20px;
+    padding:34px 55px 42px;
+    box-shadow:0 14px 42px rgba(35,48,50,.07);
+}
+#page-profile .top-row{
+    position:relative;
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:0;
+    margin-bottom:34px;
+    min-height:72px;
+}
+#page-profile .top-row .back-btn{
+    position:absolute;
+    left:0;
+    top:50%;
+    transform:translateY(-50%);
+    width:42px;
+    height:42px;
+    border:0;
+    background:transparent;
+    color:#526f78;
+    font-size:24px;
+    display:grid;
+    place-items:center;
+    border-radius:12px;
+    cursor:pointer;
+    z-index:2;
+}
+#page-profile .top-row .back-btn:hover{background:#edf5f3;color:#138e97;}
+#page-profile .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+#page-profile .brand-logo{
+    width:48px;
+    height:48px;
+    border-radius:12px;
+    background:#fff url("data:image/png;base64,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") center/contain no-repeat;
+    border:1px solid #e5e9e8;
+    font-size:0;
+    color:transparent;
+    flex:0 0 48px;
+    overflow:hidden;
+}
+#page-profile .brand-name{
+    font-size:22px;
+    line-height:1;
+    font-weight:800;
+    color:#0d5960;
+    letter-spacing:-.5px;
+}
+#page-profile .brand-name span{color:#f28a28;}
+#page-profile .brand-tagline{
+    font-size:11px;
+    color:#607e87;
+    margin-top:5px;
+}
+#page-profile h1{
+    margin:0 0 10px;
+    color:#171e21;
+    font-size:38px;
+    line-height:1.12;
+    font-weight:750;
+    letter-spacing:-1.2px;
+}
+#page-profile .subtitle{
+    margin:0 0 42px;
+    color:#70858d;
+    font-size:19px;
+    line-height:1.4;
+}
+#page-profile .field{margin-bottom:21px;}
+#page-profile .field label{
+    display:block;
+    color:#2d6972;
+    font-size:17px;
+    font-weight:700;
+    margin:0 0 9px;
+}
+#page-profile .field input{
+    width:100%;
+    height:62px;
+    border:1px solid #cbd6d8;
+    outline:none;
+    background:#fff;
+    border-radius:17px;
+    padding:0 18px;
+    font-size:18px;
+    color:#344a51;
+    box-shadow:none;
+}
+#page-profile .field input::placeholder{color:#91a1a7;opacity:1;}
+#page-profile .field input:focus{
+    border-color:#8db7b8;
+    box-shadow:0 0 0 4px rgba(19,142,151,.08);
+}
+#page-profile .continue-btn{
+    width:100%;
+    height:66px;
+    margin-top:4px;
+    border:0;
+    border-radius:17px;
+    background:#86aaa9;
+    color:#fff;
+    font-size:20px;
+    font-weight:750;
+    cursor:pointer;
+    transition:.2s ease;
+}
+#page-profile .continue-btn:hover{background:#719b9a;transform:translateY(-1px);}
+#page-profile .text-link{
+    display:block;
+    margin:21px auto 0;
+    border:0;
+    background:transparent;
+    color:#087780;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+}
+#page-profile .text-link:hover{text-decoration:underline;}
+#page-profile .error{
+    display:none;
+    color:#bd5148;
+    font-size:12px;
+    margin-top:7px;
+}
+
+/* PIN SCREENS */
+#page-profile .change-phone{
+    border:0;
+    background:transparent;
+    color:#4d7780;
+    font-size:14px;
+    cursor:pointer;
+    margin:-18px 0 24px;
+    padding:0;
+}
+#page-profile .nb-pin-content{text-align:center;}
+#page-profile .nb-pin-content h1{font-size:30px;text-align:center;}
+#page-profile .nb-pin-content .subtitle{font-size:15px;margin-bottom:22px;text-align:center;}
+#page-profile .alert{
+    display:none;
+    position:relative;
+    background:#fff0f0;
+    border:1px solid #f1c6c2;
+    color:#b34842;
+    border-radius:12px;
+    padding:10px 38px 10px 12px;
+    font-size:13px;
+    margin:0 auto 17px;
+    max-width:360px;
+}
+#page-profile .alert button{
+    position:absolute;right:8px;top:4px;border:0;background:transparent;color:#a33a3a;font-size:22px;cursor:pointer;
+}
+#page-profile .pin-dots{
+    display:flex;justify-content:center;gap:15px;margin:18px 0 30px;
+}
+#page-profile .pin-dot{
+    width:16px;height:16px;border-radius:50%;border:2px solid #8ca2a5;background:transparent;display:block;
+}
+#page-profile .pin-dot.filled{background:#138e97;border-color:#138e97;}
+#page-profile .keypad{
+    width:min(330px,100%);
+    margin:0 auto;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+}
+#page-profile .keypad button{
+    height:58px;
+    border:1px solid #d9e0df;
+    background:#fff;
+    border-radius:15px;
+    color:#29434a;
+    font-size:19px;
+    font-weight:700;
+    cursor:pointer;
+    box-shadow:0 3px 10px rgba(30,60,62,.05);
+}
+#page-profile .keypad button:hover{background:#eef8f7;border-color:#b7d6d3;color:#138e97;}
+#page-profile .helper{color:#8a979b;font-size:12px;margin:16px 0 0;text-align:center;}
+
+/* ACCOUNT */
+#page-profile .account-card{
+    background:#fff;
+    border:1px solid #e4e0db;
+    border-radius:18px;
+    padding:22px;
+    box-shadow:0 7px 22px rgba(35,48,50,.05);
+}
+#page-profile .account-header{display:flex;align-items:center;gap:15px;padding-bottom:20px;border-bottom:1px solid #ece8e3;}
+#page-profile .avatar{width:58px;height:58px;border-radius:50%;background:#dff1ef;color:#138e97;display:grid;place-items:center;font-size:22px;font-weight:800;}
+#page-profile .account-header h2{font-size:19px;margin:0 0 4px;color:#172326;}
+#page-profile .account-header p{margin:0;color:#7b898d;font-size:12px;}
+#page-profile .info-row{display:flex;justify-content:space-between;gap:20px;padding:15px 0;border-bottom:1px solid #f0ece8;font-size:14px;}
+#page-profile .info-label{color:#7a898d;}
+#page-profile .info-value{color:#27383d;text-align:right;font-weight:700;}
+#page-profile .status{margin:15px 0;padding:10px 12px;border-radius:11px;background:#eef8f5;color:#287365;font-size:12px;}
+#page-profile .account-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px;}
+#page-profile .secondary-btn,#page-profile .danger-btn{height:48px;border-radius:13px;font-weight:700;cursor:pointer;font-size:14px;}
+#page-profile .secondary-btn{border:0;background:#138e97;color:#fff;}
+#page-profile .danger-btn{border:1px solid #efceca;background:#fff;color:#b94d45;}
+
+@media(max-width:700px){
+    #page-profile .nb-profile-shell{padding:16px 12px 50px;}
+    #page-profile .nb-profile-card{width:100%;min-height:calc(100vh - 32px);padding:25px 24px 32px;border-radius:18px;}
+    #page-profile .top-row{margin-bottom:28px;}
+    #page-profile .brand-logo{width:44px;height:44px;flex-basis:44px;}
+    #page-profile .brand-name{font-size:19px;}
+    #page-profile h1{font-size:30px;}
+    #page-profile .subtitle{font-size:16px;margin-bottom:31px;}
+    #page-profile .field label{font-size:15px;}
+    #page-profile .field input{height:57px;font-size:16px;}
+    #page-profile .continue-btn{height:58px;font-size:17px;}
+    #page-profile .pin-dot{width:15px;height:15px;}
+    #page-profile .keypad{gap:10px;}
+}
+</style>
 </head>
 <body>
 
@@ -2150,232 +2394,194 @@ window.nearbuyStartTracking =
     </div>
 
 
+
 <div id="page-profile" class="page">
 
-    <div class="profile-login-screen">
+    <div class="nb-profile-shell">
 
-        <!-- User Icon -->
-        <div class="profile-user-icon">
-            <i class="far fa-user"></i>
-        </div>
-
-        <!-- Heading -->
-        <h2>Sign in into NearBuy</h2>
-
-        <!-- Description -->
-        <p>See your orders and wishlist.</p>
-
-        <!-- Sign In -->
-        <button
-    type="button"
-    class="profile-signin-btn"
-    onclick="window.location.href='profile.html'">
-
-    Sign in
-
-</button>
-</div>
-    <!-- ============================================================
-     PROFILE SIGN-IN / WELCOME
-============================================================ -->
-
-<div id="page-profile-auth" class="page">
-
-    <div class="profile-auth-screen">
-
-        <!-- Back Button -->
-        <button
-            type="button"
-            class="profile-back-btn"
-            onclick="showPage('profile')">
-
-            <i class="fas fa-arrow-left"></i>
-
-        </button>
-<!-- ============================================================
-     PROFILE LOGIN
-============================================================ -->
-
-<div id="page-profile-login" class="page">
-
-    <div class="profile-login-page">
-
-        <!-- Back Button -->
-        <button
-            type="button"
-            class="back-btn"
-            onclick="showPage('profile-auth')">
-
-            <i class="fas fa-arrow-left"></i>
-
-        </button>
-
-
-        <!-- NearBuy Logo -->
-        <div class="profile-login-brand">
-
-            <div class="profile-login-logo">
-                NB
+        <!-- SIGN UP -->
+        <section id="nbProfileSignup" class="screen">
+            <div class="top-row">
+                <button class="back-btn" type="button" onclick="nbProfileGoHome()" aria-label="Go back">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="brand">
+                    <div class="brand-logo" aria-label="NearBuy logo"></div>
+                    <div>
+                        <div class="brand-name">Near<span>Buy</span></div>
+                        <div class="brand-tagline">Buy. Sell. Support Local.</div>
+                    </div>
+                </div>
             </div>
-
-            <div class="profile-login-brand-text">
-
-                <strong>
-                    Near<span>Buy</span>
-                </strong>
-
-                <small>
-                    Buy. Sell. Support Local.
-                </small>
-
-            </div>
-
-        </div>
-
-
-        <!-- Login Content -->
-        <div class="profile-login-content">
-
-            <h1>Sign in to NearBuy</h1>
-
-            <p class="profile-login-subtitle">
-                Enter your phone number to continue.
-            </p>
-
-
-            <!-- Phone -->
-            <div class="profile-login-form-group">
-
-                <label>Phone Number</label>
-
-                <input
-                    type="tel"
-                    id="loginPhone"
-                    placeholder="0812 345 6789"
-                >
-
-            </div>
-
-
-            <!-- Continue -->
-            <button
-                type="button"
-                class="profile-login-continue-btn"
-                onclick="profileLoginContinue()">
-
-                Continue
-
-            </button>
-
-
-            <!-- Create Account -->
-            <button
-                type="button"
-                class="profile-create-account-btn"
-                onclick="showPage('profile-auth')">
-
-                New here? Create an account
-
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
-
-        <!-- NearBuy Logo -->
-        <div class="profile-brand">
-
-            <div class="profile-logo-circle">
-                NB
-            </div>
-
-            <div class="profile-brand-text">
-
-                <strong>
-                    Near<span>Buy</span>
-                </strong>
-
-                <small>
-                    Buy. Sell. Support Local.
-                </small>
-
-            </div>
-
-        </div>
-
-
-        <!-- Welcome -->
-        <div class="profile-auth-content">
 
             <h1>Welcome to NearBuy</h1>
+            <p class="subtitle">Enter your phone number to continue.</p>
 
-            <p class="profile-auth-subtitle">
-                Enter your phone number to continue.
-            </p>
+            <form id="nbProfileSignupForm" novalidate>
+                <div class="field">
+                    <label for="nbProfileName">Your Name</label>
+                    <input id="nbProfileName" type="text" placeholder="Tosin Adewale" autocomplete="name">
+                    <div id="nbProfileNameError" class="error">Please enter your name.</div>
+                </div>
 
+                <div class="field">
+                    <label for="nbProfilePhone">Phone Number</label>
+                    <input id="nbProfilePhone" type="tel" inputmode="tel" placeholder="0812 345 6789" autocomplete="tel">
+                    <div id="nbProfilePhoneError" class="error">Please enter a valid phone number.</div>
+                </div>
 
-            <!-- Name -->
-            <div class="profile-form-group">
+                <button class="continue-btn" type="submit">Continue</button>
+            </form>
 
-                <label>Your Name</label>
-
-                <input
-                    type="text"
-                    id="profileName"
-                    placeholder="Tosin Adewale"
-                >
-
-            </div>
-
-
-            <!-- Phone -->
-            <div class="profile-form-group">
-
-                <label>Phone Number</label>
-
-                <input
-                    type="tel"
-                    id="profilePhone"
-                    placeholder="0812 345 6789"
-                >
-
-            </div>
-
-
-            <!-- Continue -->
-            <button
-                type="button"
-                class="profile-continue-btn"
-                onclick="profileContinue()">
-
-                Continue
-
+            <button class="text-link" type="button" onclick="nbProfileShowLoginPhone()">
+                I already have an account
             </button>
+        </section>
 
+        <!-- CREATE PIN -->
+        <section id="nbProfileCreatePin" class="screen hidden">
+            <div class="top-row">
+                <button class="back-btn" type="button" onclick="nbProfileShowSignup()" aria-label="Go back">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="brand">
+                    <div class="brand-logo" aria-label="NearBuy logo"></div>
+                    <div>
+                        <div class="brand-name">Near<span>Buy</span></div>
+                        <div class="brand-tagline">Buy. Sell. Support Local.</div>
+                    </div>
+                </div>
+            </div>
 
-            <!-- Existing Account -->
-            <button
-    type="button"
-    class="profile-existing-btn"
-    onclick="profileExistingAccount()">
+            <button class="change-phone" type="button" onclick="nbProfileShowSignup()">← Change phone</button>
 
-    I already have an account
+            <h1>Set a 4-digit PIN</h1>
+            <p class="subtitle">You'll use this on future checkouts.</p>
 
-</button>
+            <div id="nbProfileCreateAlert" class="alert">
+                <button type="button" onclick="nbProfileHideAlert('nbProfileCreateAlert')">×</button>
+                <span id="nbProfileCreateAlertText"></span>
+            </div>
 
-        </div>
+            <div id="nbProfileCreateDots" class="pin-dots"></div>
+            <div id="nbProfileCreateKeypad" class="keypad"></div>
+            <p class="helper">You can also use your keyboard.</p>
+        </section>
+
+        <!-- LOGIN PHONE -->
+        <section id="nbProfileLoginPhone" class="screen hidden">
+            <div class="top-row">
+                <button class="back-btn" type="button" onclick="nbProfileShowSignup()" aria-label="Go back">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="brand">
+                    <div class="brand-logo" aria-label="NearBuy logo"></div>
+                    <div>
+                        <div class="brand-name">Near<span>Buy</span></div>
+                        <div class="brand-tagline">Buy. Sell. Support Local.</div>
+                    </div>
+                </div>
+            </div>
+
+            <h1>Sign in to NearBuy</h1>
+            <p class="subtitle">Enter your phone number to continue.</p>
+
+            <form id="nbProfileLoginPhoneForm" novalidate>
+                <div class="field">
+                    <label for="nbProfileLoginPhone">Phone Number</label>
+                    <input id="nbProfileLoginPhone" type="tel" inputmode="tel" placeholder="0812 345 6789" autocomplete="tel">
+                    <div id="nbProfileLoginPhoneError" class="error">Please enter a valid phone number.</div>
+                </div>
+
+                <button id="nbProfileLoginPhoneBtn" class="continue-btn" type="submit">Continue</button>
+            </form>
+
+            <button class="text-link" type="button" onclick="nbProfileShowSignup()">
+                New here? Create an account
+            </button>
+        </section>
+
+        <!-- LOGIN PIN -->
+        <section id="nbProfileLoginPin" class="screen hidden">
+            <div class="top-row">
+                <button class="back-btn" type="button" onclick="nbProfileShowLoginPhone()" aria-label="Go back">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="brand">
+                    <div class="brand-logo" aria-label="NearBuy logo"></div>
+                    <div>
+                        <div class="brand-name">Near<span>Buy</span></div>
+                        <div class="brand-tagline">Buy. Sell. Support Local.</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="change-phone" type="button" onclick="nbProfileShowLoginPhone()">← Change phone</button>
+
+            <h1>Enter your 4-digit PIN</h1>
+            <p class="subtitle">Enter your PIN to sign in to your account.</p>
+
+            <div id="nbProfileLoginAlert" class="alert">
+                <button type="button" onclick="nbProfileHideAlert('nbProfileLoginAlert')">×</button>
+                <span id="nbProfileLoginAlertText"></span>
+            </div>
+
+            <div id="nbProfileLoginDots" class="pin-dots"></div>
+            <div id="nbProfileLoginKeypad" class="keypad"></div>
+            <p class="helper">You can also use your keyboard.</p>
+        </section>
+
+        <!-- ACCOUNT -->
+        <section id="nbProfileAccount" class="screen hidden">
+            <div class="top-row">
+                <button class="back-btn" type="button" onclick="nbProfileGoHome()" aria-label="Go back">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="brand">
+                    <div class="brand-logo" aria-label="NearBuy logo"></div>
+                    <div>
+                        <div class="brand-name">Near<span>Buy</span></div>
+                        <div class="brand-tagline">Buy. Sell. Support Local.</div>
+                    </div>
+                </div>
+            </div>
+
+            <h1>My Account</h1>
+            <p class="subtitle">Manage your NearBuy account.</p>
+
+            <div class="account-card">
+                <div class="account-header">
+                    <div id="nbProfileAvatar" class="avatar">N</div>
+                    <div>
+                        <h2 id="nbProfileWelcome">Welcome back</h2>
+                        <p>Your NearBuy account</p>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">Name</div>
+                    <div id="nbProfileAccountName" class="info-value">—</div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">Phone Number</div>
+                    <div id="nbProfileAccountPhone" class="info-value">—</div>
+                </div>
+
+                <div id="nbProfileAccountStatus" class="status">Signed in on this device.</div>
+
+                <div class="account-actions">
+                    <button class="secondary-btn" type="button" onclick="nbProfileGoToOrders()">View My Orders</button>
+                    <button class="danger-btn" type="button" onclick="nbProfileLogout()">Sign Out</button>
+                </div>
+            </div>
+        </section>
 
     </div>
-
 </div>
+
     <!-- AUTH -->
     <div id="page-auth" class="page">
-      
-    
-
-</div>
         <div class="auth-page">
             <button class="back-btn" onclick="showPage('home')" style="align-self:flex-start;"><i class="fas fa-arrow-left"></i></button>
             <div class="auth-icon"><i class="fas fa-user-circle"></i></div>
@@ -2396,6 +2602,9 @@ window.nearbuyStartTracking =
             </div>
             <button class="btn-primary" onclick="signIn()" style="max-width:320px;">Sign in</button>
             <p style="margin-top:16px;font-size:12px;color:var(--text-muted);">Demo: any phone, PIN 1234</p>
+        </div>
+    </div>
+
         </div>
     </div>
 
@@ -2770,6 +2979,7 @@ window.nearbuyStartTracking =
                     type="file"
                     id="paymentReceipt"
                     accept="image/*,.pdf"
+                    required
                 />
 
                 <small style="
@@ -3672,7 +3882,7 @@ window.nearbuyStartTracking =
         <button class="nav-item active" onclick="showPage('home')" data-page="home"><i class="fas fa-home"></i><span>Home</span></button>
         <button class="nav-item" onclick="showPage('categories')" data-page="categories"><i class="fas fa-th-large"></i><span>Categories</span></button>
         <button class="nav-item" onclick="showPage('wishlist')" data-page="wishlist"><i class="far fa-bookmark"></i><span>Wishlist</span></button>
-        <button class="nav-item" onclick="showPage('orders')" data-page="orders"><i class="fas fa-clipboard-list"></i><span>Orders</span></button>
+        <button class="nav-item" onclick="openUserOrders(); return false;" data-page="orders"><i class="fas fa-clipboard-list"></i><span>Orders</span></button>
         <button class="nav-item" onclick="showPage('profile')" data-page="profile"><i class="far fa-user"></i><span>Profile</span></button>
     </nav>
 
@@ -5951,6 +6161,7 @@ function renderSellerAdminCard(s) {
         </div>`;
 }
 
+async 
 async function toggleSellerStatus(sellerId) {
     const seller = sellers.find(s => String(s.sellerId || s.id || '') === String(sellerId));
 
@@ -6003,6 +6214,7 @@ async function toggleSellerStatus(sellerId) {
     }
 }
 
+
 function openAddSellerForm() {
     const c = document.getElementById('sellerFormContainer'); if (!c) return;
     c.innerHTML = `<div style="background:#f8f8f8;padding:15px;border-radius:12px;margin-bottom:15px;">
@@ -6010,7 +6222,6 @@ function openAddSellerForm() {
         <input id="sellerName" placeholder="Seller full name" style="width:100%;padding:10px;margin-bottom:8px;">
         <input id="sellerBusiness" placeholder="Business / store name" style="width:100%;padding:10px;margin-bottom:8px;">
         <input id="sellerPhone" placeholder="Phone number" style="width:100%;padding:10px;margin-bottom:8px;">
-          <input id="sellerPin" type="password" inputmode="numeric" maxlength="4" placeholder="4-digit seller PIN" style="width:100%;padding:10px;margin-bottom:8px;">
         <input id="sellerEmail" type="email" placeholder="Email address" style="width:100%;padding:10px;margin-bottom:8px;">
         <input id="sellerLocation" placeholder="Location" style="width:100%;padding:10px;margin-bottom:8px;">
         <label style="display:block;font-weight:600;margin-bottom:6px;">Seller Photo</label>
@@ -6122,7 +6333,7 @@ function generateSellerId() {
 }
 
 function getSellerLink(sellerId) {
-    return `${window.location.origin}/seller.html?sellerId=${encodeURIComponent(sellerId)}`;
+    return `${window.location.origin}${window.location.pathname}?sellerId=${encodeURIComponent(sellerId)}`;
 }
 
 async function copySellerLink(sellerId) {
@@ -6140,6 +6351,7 @@ function openSellerLink(sellerId) {
     const link = getSellerLink(sellerId);
     window.open(link, '_blank');
 }
+
 
 // ============================================================
 // ADD PRODUCT FORM
@@ -7248,7 +7460,7 @@ async function renderOrdersPage() {
     const container = document.getElementById('ordersPageList');
     if (!container) return;
     if (!isNearbuyLoggedIn()) {
-        container.innerHTML = `<div class="empty-state"><i class="fas fa-user-lock" style="font-size:38px;"></i><p style="margin-top:10px;">Sign in to view your orders.</p><button class="btn-primary" onclick="window.location.href='profile.html'" style="margin-top:14px;">Sign in</button></div>`;
+        container.innerHTML = `<div class="empty-state"><i class="fas fa-user-lock" style="font-size:38px;"></i><p style="margin-top:10px;">Sign in to view your orders.</p><button class="btn-primary" onclick="showPage('profile')" style="margin-top:14px;">Sign in</button></div>`;
         return;
     }
     try {
@@ -7280,7 +7492,7 @@ async function renderOrdersPage() {
 
 function openTrackedOrderById(orderId) {
     const phone = getCurrentUserPhone();
-    if (!isNearbuyLoggedIn() || !phone) { window.location.href='profile.html'; return; }
+    if (!isNearbuyLoggedIn() || !phone) { showPage('profile'); return; }
     const order = orders.find(o => String(o.id) === String(orderId) && normalizeNearbuyPhone(o.phone) === phone);
     if (!order) { showToast('Order not found'); return; }
     currentTrackedOrder = order; setUserCurrentOrderId(order.id); showPage('tracking'); updateTracking(order.id); nearbuyStartTracking(order.id);
@@ -7296,6 +7508,10 @@ function finishNearbuyIntro() {
 // ============================================================
 
 function showPage(page) {
+    if (page === 'seller') {
+        const sellerPage = document.getElementById('page-seller');
+        if (sellerPage) sellerPage.style.display = 'block';
+    }
 
     document
         .querySelectorAll('.page')
@@ -7375,6 +7591,12 @@ function showPage(page) {
         renderChatMessages();
     }
 
+    if (page === 'profile') {
+        if (typeof window.initNearbuyProfile === 'function') {
+            window.initNearbuyProfile();
+        }
+    }
+
 
     // ========================================================
     // TRACKING
@@ -7385,7 +7607,7 @@ function showPage(page) {
         if (!isNearbuyLoggedIn()) {
             currentTrackedOrder = null;
             showToast(' Please sign in to view your order.');
-            window.location.href = 'profile.html';
+            showPage('profile');
             return;
         }
 
@@ -7567,7 +7789,7 @@ function submitReportIssue() {
         // ============================================================
         const ordersNavButton = document.querySelector('[data-page="orders"]');
         if (ordersNavButton) {
-            ordersNavButton.addEventListener('click', openUserOrders);
+            ordersNavButton.onclick = function(e) { e.preventDefault(); openUserOrders(); };
         }
 
         // ============================================================
@@ -7586,7 +7808,7 @@ function submitReportIssue() {
             wishlistButton.addEventListener('click', function() {
                 if (!isNearbuyLoggedIn()) {
                     showToast(' Please sign in to use your wishlist.');
-                    window.location.href = 'profile.html';
+                    showPage('profile');
                     return;
                 }
                 if (wishlist.size === 0) {
@@ -7663,17 +7885,17 @@ function setUserCurrentOrderId(orderId) {
 
 function handleHeaderProfileClick() {
     if (isNearbuyLoggedIn()) {
-        window.location.href = 'profile.html';
+        showPage('profile');
     } else {
         showToast(' Please sign in to continue.');
-        window.location.href = 'profile.html';
+        showPage('profile');
     }
 }
 
 function handleHeaderChatClick() {
     if (!isNearbuyLoggedIn()) {
         showToast(' Create an account or sign in to chat with a seller.');
-        window.location.href = 'profile.html';
+        showPage('profile');
         return;
     }
     openGeneralChat();
@@ -7682,7 +7904,7 @@ function handleHeaderChatClick() {
 function handleProductClick(id) {
     if (!isNearbuyLoggedIn()) {
         showToast(' Please sign in before shopping.');
-        window.location.href = 'profile.html';
+        showPage('profile');
         return;
     }
     addToCart(id);
@@ -7710,14 +7932,14 @@ async function openUserOrders() {
     if (!isNearbuyLoggedIn()) {
         currentTrackedOrder = null;
         showToast(' Please sign in to view your orders.');
-        window.location.href = 'profile.html';
+        showPage('profile');
         return;
     }
 
     const phone = getCurrentUserPhone();
     if (!phone) {
         showToast(' Please sign in again to view your orders.');
-        window.location.href = 'profile.html';
+        showPage('profile');
         return;
     }
 
@@ -7755,35 +7977,482 @@ async function openUserOrders() {
     }
 }
 
+
 // ============================================================
-// PROFILE GATE FUNCTIONS
+// NEARBUY INTEGRATED PROFILE
 // ============================================================
 
-function profileContinue() {
-    const name = document.getElementById('profileName')?.value.trim();
-    const phone = document.getElementById('profilePhone')?.value.trim();
-    if (!name || !phone) {
-        showToast('Please enter your name and phone number');
+const nbProfileScreens = [
+    "nbProfileSignup",
+    "nbProfileCreatePin",
+    "nbProfileLoginPhone",
+    "nbProfileLoginPin",
+    "nbProfileAccount"
+];
+
+let nbProfilePendingSignup = { name:"", phone:"" };
+let nbProfilePendingLoginPhone = "";
+let nbProfileCreatePinValue = "";
+let nbProfileLoginPinValue = "";
+let nbProfileBusy = false;
+
+function nbProfileNormalizePhone(value){
+    return String(value || "").replace(/\D/g, "");
+}
+
+function nbProfileDisplayPhone(value){
+    const p = nbProfileNormalizePhone(value);
+    return p.length === 11 ? p.slice(0,4) + " " + p.slice(4,7) + " " + p.slice(7) : (value || "");
+}
+
+function nbProfileValidPhone(value){
+    const p = nbProfileNormalizePhone(value);
+    return /^(0?234)?[0-9]{10,11}$/.test(p);
+}
+
+function nbProfileUserDocId(phone){
+    return nbProfileNormalizePhone(phone);
+}
+
+async function nbProfileHashPin(pin){
+    const data = new TextEncoder().encode(pin);
+    const hash = await crypto.subtle.digest("SHA-256", data);
+    return Array.from(new Uint8Array(hash))
+        .map(b => b.toString(16).padStart(2,"0"))
+        .join("");
+}
+
+function nbProfileGetLocalUser(){
+    return {
+        name: localStorage.getItem("nearbuy_name") || localStorage.getItem("nearbuyProfileName") || "",
+        phone: localStorage.getItem("nearbuy_phone") || localStorage.getItem("nearbuyProfilePhone") || "",
+        pinHash: localStorage.getItem("nearbuy_pin_hash") || "",
+        loggedIn: localStorage.getItem("nearbuy_logged_in") === "true"
+    };
+}
+
+function nbProfileSetSession(user){
+    localStorage.setItem("nearbuy_name", user.name || "");
+    localStorage.setItem("nearbuy_phone", user.phone || "");
+    localStorage.setItem("nearbuyProfileName", user.name || "");
+    localStorage.setItem("nearbuyProfilePhone", user.phone || "");
+    localStorage.setItem("nearbuy_logged_in", "true");
+    localStorage.setItem("nearbuy_login_phone", user.phone || "");
+    localStorage.setItem("nearbuyLoginPhone", user.phone || "");
+
+    // Keep the rest of the NearBuy app aware of the login.
+    if (typeof window.updateHeaderAuthUI === "function") {
+        window.updateHeaderAuthUI();
+    }
+    if (typeof window.startNotificationListener === "function") {
+        window.startNotificationListener();
+    }
+}
+
+function nbProfileClearSession(){
+    [
+        "nearbuy_logged_in",
+        "nearbuy_login_phone",
+        "nearbuyLoginPhone",
+        "nearbuyCurrentOrderId",
+        "nearbuyCurrentTrackedOrder"
+    ].forEach(k => localStorage.removeItem(k));
+
+    Object.keys(localStorage)
+        .filter(k => k.startsWith("nearbuyCurrentOrderId:"))
+        .forEach(k => localStorage.removeItem(k));
+
+    if (typeof window.updateHeaderAuthUI === "function") {
+        window.updateHeaderAuthUI();
+    }
+    if (typeof window.stopNotificationListener === "function") {
+        window.stopNotificationListener();
+    }
+}
+
+function nbProfileShowScreen(id){
+    nbProfileScreens.forEach(screenId => {
+        const el = document.getElementById(screenId);
+        if (el) el.classList.toggle("hidden", screenId !== id);
+    });
+    window.scrollTo({ top:0, behavior:"smooth" });
+}
+
+function nbProfileHideAlert(id){
+    const el = document.getElementById(id);
+    if (el) el.style.display = "none";
+}
+
+function nbProfileShowAlert(id,text){
+    const textEl = document.getElementById(id + "Text");
+    const el = document.getElementById(id);
+    if (textEl) textEl.textContent = text;
+    if (el) el.style.display = "block";
+}
+
+function nbProfileSetError(id,on){
+    const el = document.getElementById(id);
+    if (el) el.style.display = on ? "block" : "none";
+}
+
+function nbProfileRenderDots(id,value){
+    const box = document.getElementById(id);
+    if (!box) return;
+    box.innerHTML = "";
+    for(let i=0;i<4;i++){
+        const dot = document.createElement("span");
+        dot.className = "pin-dot" + (i < value.length ? " filled" : "");
+        box.appendChild(dot);
+    }
+}
+
+function nbProfileRenderKeypad(id,handler){
+    const box = document.getElementById(id);
+    if (!box) return;
+
+    box.innerHTML = "";
+
+    [1,2,3,4,5,6,7,8,9].forEach(n => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "key";
+        b.textContent = n;
+        b.addEventListener("click", () => handler(String(n)));
+        box.appendChild(b);
+    });
+
+    const zero = document.createElement("button");
+    zero.type = "button";
+    zero.className = "key zero";
+    zero.textContent = "0";
+    zero.addEventListener("click", () => handler("0"));
+    box.appendChild(zero);
+
+    const del = document.createElement("button");
+    del.type = "button";
+    del.className = "key delete";
+    del.innerHTML = '<i class="fas fa-delete-left"></i>';
+    del.setAttribute("aria-label","Delete");
+    del.addEventListener("click", () => handler("delete"));
+    box.appendChild(del);
+}
+
+function nbProfileHandleCreateKey(value){
+    if (nbProfileBusy) return;
+
+    nbProfileHideAlert("nbProfileCreateAlert");
+
+    if (value === "delete") {
+        nbProfileCreatePinValue = nbProfileCreatePinValue.slice(0,-1);
+    } else if (nbProfileCreatePinValue.length < 4) {
+        nbProfileCreatePinValue += value;
+    }
+
+    nbProfileRenderDots("nbProfileCreateDots", nbProfileCreatePinValue);
+
+    if (nbProfileCreatePinValue.length === 4) {
+        nbProfileFinishRegistration();
+    }
+}
+
+function nbProfileHandleLoginKey(value){
+    if (nbProfileBusy) return;
+
+    nbProfileHideAlert("nbProfileLoginAlert");
+
+    if (value === "delete") {
+        nbProfileLoginPinValue = nbProfileLoginPinValue.slice(0,-1);
+    } else if (nbProfileLoginPinValue.length < 4) {
+        nbProfileLoginPinValue += value;
+    }
+
+    nbProfileRenderDots("nbProfileLoginDots", nbProfileLoginPinValue);
+
+    if (nbProfileLoginPinValue.length === 4) {
+        nbProfileVerifyLogin();
+    }
+}
+
+async function nbProfileFinishRegistration(){
+    nbProfileBusy = true;
+    nbProfileHideAlert("nbProfileCreateAlert");
+
+    try {
+        const phone = nbProfileNormalizePhone(nbProfilePendingSignup.phone);
+        const pinHash = await nbProfileHashPin(nbProfileCreatePinValue);
+
+        const user = {
+            name: nbProfilePendingSignup.name.trim(),
+            phone,
+            pinHash,
+            createdAt: new Date().toISOString()
+        };
+
+        const fb = window.nearbuyFirebase;
+
+        if (fb?.db && typeof fb.setDoc === "function" && typeof fb.doc === "function") {
+            try {
+                await fb.setDoc(
+                    fb.doc(fb.db, "users", nbProfileUserDocId(phone)),
+                    user,
+                    { merge:true }
+                );
+            } catch(error) {
+                console.warn("Could not save NearBuy account to Firestore. Local account will continue.", error);
+            }
+        }
+
+        localStorage.setItem("nearbuy_name", user.name);
+        localStorage.setItem("nearbuy_phone", phone);
+        localStorage.setItem("nearbuyProfileName", user.name);
+        localStorage.setItem("nearbuyProfilePhone", phone);
+        localStorage.setItem("nearbuy_pin_hash", pinHash);
+        localStorage.removeItem("nearbuy_pin");
+
+        nbProfileSetSession(user);
+
+        nbProfileCreatePinValue = "";
+        nbProfileRenderDots("nbProfileCreateDots", "");
+
+        nbProfileShowAccount(user);
+
+    } catch(error) {
+        console.error("NearBuy profile registration error:", error);
+        nbProfileShowAlert(
+            "nbProfileCreateAlert",
+            "We could not finish setting up your account. Please try again."
+        );
+    } finally {
+        nbProfileBusy = false;
+    }
+}
+
+async function nbProfileVerifyLogin(){
+    nbProfileBusy = true;
+    nbProfileHideAlert("nbProfileLoginAlert");
+
+    try {
+        const phone = nbProfileNormalizePhone(nbProfilePendingLoginPhone);
+        const enteredHash = await nbProfileHashPin(nbProfileLoginPinValue);
+
+        let user = null;
+        const fb = window.nearbuyFirebase;
+
+        if (fb?.db && typeof fb.getDoc === "function" && typeof fb.doc === "function") {
+            try {
+                const snap = await fb.getDoc(
+                    fb.doc(fb.db, "users", nbProfileUserDocId(phone))
+                );
+                if (snap.exists()) {
+                    user = snap.data();
+                }
+            } catch(error) {
+                console.warn("NearBuy Firestore login lookup failed; checking local account.", error);
+            }
+        }
+
+        if (!user) {
+            const local = nbProfileGetLocalUser();
+
+            if (
+                nbProfileNormalizePhone(local.phone) === phone &&
+                local.pinHash
+            ) {
+                user = {
+                    name: local.name,
+                    phone: local.phone,
+                    pinHash: local.pinHash
+                };
+            } else {
+                const legacyPin = localStorage.getItem("nearbuy_pin");
+
+                if (
+                    nbProfileNormalizePhone(local.phone) === phone &&
+                    legacyPin
+                ) {
+                    const legacyHash = await nbProfileHashPin(legacyPin);
+                    user = {
+                        name: local.name,
+                        phone: local.phone,
+                        pinHash: legacyHash
+                    };
+                }
+            }
+        }
+
+        if (!user || !user.pinHash || user.pinHash !== enteredHash) {
+            nbProfileLoginPinValue = "";
+            nbProfileRenderDots("nbProfileLoginDots","");
+            nbProfileShowAlert("nbProfileLoginAlert","Incorrect PIN");
+            return;
+        }
+
+        localStorage.setItem("nearbuy_pin_hash", user.pinHash);
+        localStorage.removeItem("nearbuy_pin");
+
+        nbProfileSetSession({
+            name: user.name || "NearBuy User",
+            phone: user.phone || phone
+        });
+
+        nbProfileLoginPinValue = "";
+        nbProfileRenderDots("nbProfileLoginDots","");
+
+        nbProfileShowAccount({
+            name: user.name || "NearBuy User",
+            phone: user.phone || phone
+        });
+
+    } catch(error) {
+        console.error("NearBuy profile login error:", error);
+        nbProfileLoginPinValue = "";
+        nbProfileRenderDots("nbProfileLoginDots","");
+        nbProfileShowAlert(
+            "nbProfileLoginAlert",
+            "Unable to sign in right now. Please try again."
+        );
+    } finally {
+        nbProfileBusy = false;
+    }
+}
+
+function nbProfileShowAccount(user){
+    const name = user.name || "NearBuy User";
+    const phone = user.phone || "";
+
+    const nameEl = document.getElementById("nbProfileAccountName");
+    const phoneEl = document.getElementById("nbProfileAccountPhone");
+    const welcomeEl = document.getElementById("nbProfileWelcome");
+    const avatarEl = document.getElementById("nbProfileAvatar");
+
+    if (nameEl) nameEl.textContent = name;
+    if (phoneEl) phoneEl.textContent = nbProfileDisplayPhone(phone);
+    if (welcomeEl) welcomeEl.textContent = "Welcome back, " + name;
+
+    const first = name.trim().charAt(0).toUpperCase() || "N";
+    if (avatarEl) avatarEl.textContent = first;
+
+    nbProfileShowScreen("nbProfileAccount");
+}
+
+function nbProfileShowSignup(){
+    nbProfilePendingSignup = { name:"", phone:"" };
+    nbProfileCreatePinValue = "";
+    nbProfileRenderDots("nbProfileCreateDots","");
+    nbProfileHideAlert("nbProfileCreateAlert");
+
+    const nameInput = document.getElementById("nbProfileName");
+    const phoneInput = document.getElementById("nbProfilePhone");
+    if (nameInput) nameInput.value = "";
+    if (phoneInput) phoneInput.value = "";
+
+    nbProfileShowScreen("nbProfileSignup");
+}
+
+function nbProfileShowLoginPhone(){
+    nbProfilePendingLoginPhone = "";
+    nbProfileLoginPinValue = "";
+    nbProfileRenderDots("nbProfileLoginDots","");
+    nbProfileHideAlert("nbProfileLoginAlert");
+
+    const input = document.getElementById("nbProfileLoginPhone");
+    if (input) input.value = "";
+
+    nbProfileShowScreen("nbProfileLoginPhone");
+}
+
+function nbProfileGoHome(){
+    showPage("home");
+}
+
+function nbProfileGoToOrders(){
+    showPage("orders");
+}
+
+function nbProfileLogout(){
+    nbProfileClearSession();
+    nbProfileShowSignup();
+    showToast("You have been signed out.");
+}
+
+function initNearbuyProfile(){
+    const user = nbProfileGetLocalUser();
+
+    if (user.loggedIn && user.name && user.phone) {
+        nbProfileShowAccount(user);
+    } else {
+        nbProfileShowLoginPhone();
+    }
+}
+
+window.nbProfileShowSignup = nbProfileShowSignup;
+window.nbProfileShowLoginPhone = nbProfileShowLoginPhone;
+window.nbProfileGoHome = nbProfileGoHome;
+window.nbProfileGoToOrders = nbProfileGoToOrders;
+window.nbProfileLogout = nbProfileLogout;
+window.nbProfileHideAlert = nbProfileHideAlert;
+window.initNearbuyProfile = initNearbuyProfile;
+
+nbProfileRenderDots("nbProfileCreateDots", "");
+nbProfileRenderDots("nbProfileLoginDots", "");
+nbProfileRenderKeypad("nbProfileCreateKeypad", nbProfileHandleCreateKey);
+nbProfileRenderKeypad("nbProfileLoginKeypad", nbProfileHandleLoginKey);
+
+document.getElementById("nbProfileSignupForm")?.addEventListener("submit", e => {
+    e.preventDefault();
+
+    const name = document.getElementById("nbProfileName")?.value.trim() || "";
+    const phone = document.getElementById("nbProfilePhone")?.value.trim() || "";
+
+    nbProfileSetError("nbProfileNameError", !name);
+    nbProfileSetError("nbProfilePhoneError", !nbProfileValidPhone(phone));
+
+    if (!name || !nbProfileValidPhone(phone)) return;
+
+    nbProfilePendingSignup = { name, phone };
+    nbProfileCreatePinValue = "";
+    nbProfileRenderDots("nbProfileCreateDots","");
+    nbProfileHideAlert("nbProfileCreateAlert");
+    nbProfileShowScreen("nbProfileCreatePin");
+});
+
+document.getElementById("nbProfileLoginPhoneForm")?.addEventListener("submit", e => {
+    e.preventDefault();
+
+    const phone = document.getElementById("nbProfileLoginPhone")?.value.trim() || "";
+
+    nbProfileSetError("nbProfileLoginPhoneError", !nbProfileValidPhone(phone));
+
+    if (!nbProfileValidPhone(phone)) return;
+
+    nbProfilePendingLoginPhone = phone;
+    nbProfileLoginPinValue = "";
+    nbProfileRenderDots("nbProfileLoginDots","");
+    nbProfileHideAlert("nbProfileLoginAlert");
+    nbProfileShowScreen("nbProfileLoginPin");
+});
+
+window.addEventListener("keydown", e => {
+    const active = document.querySelector("#page-profile .screen:not(.hidden)")?.id;
+
+    if (active !== "nbProfileCreatePin" && active !== "nbProfileLoginPin") {
         return;
     }
-    localStorage.setItem('nearbuyProfileName', name);
-    localStorage.setItem('nearbuyProfilePhone', phone);
-    showPage('profile-pin');
-}
 
-function profileExistingAccount() {
-    showPage('profile-login');
-}
-
-function profileLoginContinue() {
-    const phone = document.getElementById('loginPhone')?.value.trim();
-    if (!phone) {
-        showToast('Please enter your phone number');
-        return;
+    if (/^[0-9]$/.test(e.key)) {
+        e.preventDefault();
+        active === "nbProfileCreatePin"
+            ? nbProfileHandleCreateKey(e.key)
+            : nbProfileHandleLoginKey(e.key);
     }
-    localStorage.setItem('nearbuyLoginPhone', phone);
-    showToast('Phone number entered successfully');
-}
+
+    if (e.key === "Backspace") {
+        e.preventDefault();
+        active === "nbProfileCreatePin"
+            ? nbProfileHandleCreateKey("delete")
+            : nbProfileHandleLoginKey("delete");
+    }
+});
 
 // ============================================================
 // REAL-TIME NOTIFICATIONS + CHAT
@@ -7899,7 +8568,7 @@ function startChatForProductById(id) {
 function startChatForProduct(product) {
     if (!isNearbuyLoggedIn()) {
         showToast(' Create an account or sign in to chat with a seller.');
-        window.location.href = 'profile.html';
+        showPage('profile');
         return;
     }
     currentChatProduct = product;
@@ -7956,7 +8625,7 @@ function renderChatMessages() {
 
 async function sendChatMessage() {
     if (!isNearbuyLoggedIn()) {
-        window.location.href = 'profile.html';
+        showPage('profile');
         return;
     }
     const input = document.getElementById('chatMessageInput');
@@ -8188,5 +8857,124 @@ initializeNearBuy();
 
     </script>
 
+
+<!-- ============================================================
+     INTEGRATED SELLER AREA
+============================================================ -->
+<div id="page-seller" class="page seller-shell">
+
+<div class="app">
+<header class="topbar">
+<div class="brand"><div class="brand-mark"><i class="fas fa-store"></i></div><div><strong>NEARBUY</strong><small>Seller Dashboard</small></div></div>
+<div class="top-actions"><button aria-label="Home" class="icon-btn" onclick="goHome()"><i class="fas fa-arrow-left"></i></button><button aria-label="Logout" class="icon-btn" id="nbSellerLogoutTop" onclick="sellerLogout()" style="display:none"><i class="fas fa-right-from-bracket"></i></button></div>
+</header>
+<main>
+<section class="screen active" id="nbSellerLoginScreen">
+<div class="login-wrap"><div class="login-card">
+<div class="login-logo"><i class="fas fa-store"></i></div>
+<h1>Seller Login</h1><p id="nbSellerIntro">Enter the phone number and 4-digit PIN provided by NEARBUY.</p>
+<div class="field"><label>Phone Number</label><input id="nbSellerLoginPhone" inputmode="tel" placeholder="0812 345 6789" type="tel"/></div>
+<div class="field"><label>4-Digit PIN</label><div class="pin-row"><input id="nbSellerPin1" inputmode="numeric" maxlength="1" type="password"/><input id="nbSellerPin2" inputmode="numeric" maxlength="1" type="password"/><input id="nbSellerPin3" inputmode="numeric" maxlength="1" type="password"/><input id="nbSellerPin4" inputmode="numeric" maxlength="1" type="password"/></div></div>
+<div class="error" id="nbSellerLoginError"></div>
+<button class="btn btn-primary" onclick="sellerLogin()" style="width:100%;margin-top:16px"><i class="fas fa-lock"></i> Sign In</button>
+<button class="btn btn-light" onclick="goHome()" style="width:100%;margin-top:8px">Back to NEARBUY</button>
+</div></div>
+</section>
+<section class="screen" id="nbSellerDashboardScreen">
+<div class="dashboard-head"><div><h1 id="nbSellerWelcomeTitle">Welcome back</h1><p id="nbSellerBusinessLine"></p></div><button class="btn btn-primary" onclick="openProductModal()"><i class="fas fa-plus"></i> Add Product</button></div>
+<div class="stats"><div class="stat"><div class="num" id="nbSellerStatProducts">0</div><div class="label">My Products</div></div><div class="stat"><div class="num" id="nbSellerStatOrders">0</div><div class="label">My Orders</div></div><div class="stat"><div class="num" id="nbSellerStatPending">0</div><div class="label">Pending Orders</div></div><div class="stat"><div class="num" id="nbSellerStatUnread">0</div><div class="label">Unread Notifications</div></div></div>
+<div class="tabs">
+<button class="tab active" data-tab="products" onclick="showTab('products')"><i class="fas fa-box"></i> Products</button>
+<button class="tab" data-tab="orders" onclick="showTab('orders')"><i class="fas fa-receipt"></i> Orders</button>
+<button class="tab" data-tab="chats" onclick="showTab('chats')"><i class="far fa-comment-dots"></i> Chats</button>
+<button class="tab" data-tab="notifications" onclick="showTab('notifications')"><i class="far fa-bell"></i> Notifications</button>
+<button class="tab" data-tab="profile" onclick="showTab('profile')"><i class="far fa-user"></i> Profile</button>
+</div>
+<div class="panel tab-panel" id="nbSellerTab-products"></div>
+<div class="panel tab-panel" id="nbSellerTab-orders" style="display:none"></div>
+<div class="panel tab-panel" id="nbSellerTab-chats" style="display:none"></div>
+<div class="panel tab-panel" id="nbSellerTab-notifications" style="display:none"></div>
+<div class="panel tab-panel" id="nbSellerTab-profile" style="display:none"></div>
+</section>
+</main>
+</div>
+<div class="modal" id="nbSellerProductModal"><div class="modal-card"><div class="modal-head"><h2 id="nbSellerProductModalTitle">Add Product</h2><button class="close" onclick="closeProductModal()">×</button></div>
+<input id="nbSellerEditProductId" type="hidden"/>
+<div class="field"><label>Product Name</label><input id="nbSellerProductName" placeholder="e.g. Campus Hoodie"/></div>
+<div class="field"><label>Price (₦)</label><input id="nbSellerProductPrice" min="1" placeholder="15000" type="number"/></div>
+<div class="field"><label>Category</label><select id="nbSellerProductCategory"><option>Electronics</option><option>Fashion</option><option>Books</option><option>Home</option><option>Beauty</option><option>Food</option><option>Other</option></select></div>
+<div class="field"><label>Product Image</label><input accept="image/*" id="nbSellerProductImage" onchange="previewImage(event)" type="file"/><img alt="Product preview" class="preview" id="nbSellerProductPreview"/></div>
+<div class="form-actions"><button class="btn btn-light" onclick="closeProductModal()">Cancel</button><button class="btn btn-primary" onclick="saveProduct()">Save Product</button></div>
+</div></div>
+<div class="toast" id="nbSellerToast"></div>
+
+
+</div>
+
+<script type="module" id="nearbuy-integrated-seller-script">
+
+import { getApp } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js';
+import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
+const db=getFirestore(getApp());
+let currentSeller=null,products=[],orders=[],notifications=[],rooms={},activeRoom='',unsubs=[];
+const params=new URLSearchParams(location.search); const urlSellerId=params.get('sellerId');
+const $=id=>document.getElementById(id);
+function toast(msg){const t=$('nbSellerToast');t.textContent=msg;t.style.display='block';clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.style.display='none',3000)}
+function normPhone(v){return String(v||'').replace(/\D/g,'').replace(/^234/,'0').replace(/^0?/,'0')}
+function escapeHtml(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+async function hashPin(pin){const data=new TextEncoder().encode(pin);const buf=await crypto.subtle.digest('SHA-256',data);return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('')}
+async function loadSeller(){const snap=await getDocs(collection(db,'sellers'));let found=null;snap.forEach(d=>{const s={firestoreId:d.id,...d.data()};if(urlSellerId&&String(s.sellerId)===String(urlSellerId))found=s});if(found){currentSeller=found;$('nbSellerBusinessLine').textContent=found.business||'NEARBUY Seller';$('nbSellerIntro').textContent=`Sign in to manage ${found.business||'your NEARBUY store'}.`;if(found.status==='inactive'){$('nbSellerLoginError').textContent='This seller account is inactive. Please contact NEARBUY.';$('nbSellerLoginError').style.display='block';$('nbSellerLoginPhone').disabled=true;document.querySelectorAll('.pin-row input').forEach(x=>x.disabled=true)}}else{ $('nbSellerIntro').textContent='This seller link is invalid or the seller profile could not be found.'; }}
+function pinValue(){return ['nbSellerPin1','nbSellerPin2','nbSellerPin3','nbSellerPin4'].map(id=>$(id).value).join('')}
+window.sellerLogin=async function(){if(!currentSeller){toast('Seller profile not found');return}const phone=normPhone($('nbSellerLoginPhone').value);const pin=pinValue();const err=$('nbSellerLoginError');err.style.display='none';if(!phone||!/^\d{4}$/.test(pin)){err.textContent='Enter your phone number and 4-digit PIN.';err.style.display='block';return}try{const hash=await hashPin(pin);if(normPhone(currentSeller.phone)!==phone||currentSeller.pinHash!==hash){err.textContent='Incorrect phone number or PIN.';err.style.display='block';return}sessionStorage.setItem('nearbuySellerId',currentSeller.sellerId);showDashboard();}catch(e){console.error(e);err.textContent='Unable to sign in. Please try again.';err.style.display='block'}}
+function showDashboard(){ $('nbSellerLoginScreen').classList.remove('active');$('nbSellerDashboardScreen').classList.add('active');$('nbSellerLogoutTop').style.display='block';$('nbSellerWelcomeTitle').textContent=`Welcome, ${currentSeller.name||'Seller'}`;startListeners();renderAll() }
+function clearListeners(){unsubs.forEach(fn=>{try{fn()}catch{}});unsubs=[]}
+function startListeners(){clearListeners();unsubs.push(onSnapshot(collection(db,'products'),snap=>{products=[];snap.forEach(d=>products.push({firestoreId:d.id,...d.data()}));renderAll()}));unsubs.push(onSnapshot(collection(db,'orders'),snap=>{orders=[];snap.forEach(d=>orders.push({firestoreId:d.id,...d.data()}));renderAll()}));unsubs.push(onSnapshot(collection(db,'notifications'),snap=>{notifications=[];snap.forEach(d=>{const n={firestoreId:d.id,...d.data()};if(String(n.sellerId||'')===String(currentSeller.sellerId||''))notifications.push(n)});notifications.sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));renderAll()}));unsubs.push(onSnapshot(collection(db,'chats'),snap=>{const mineProducts=new Set(products.filter(p=>String(p.sellerId)===String(currentSeller.sellerId)).map(p=>String(p.id)));rooms={};snap.forEach(d=>{const m={firestoreId:d.id,...d.data()};if(mineProducts.has(String(m.productId))){const key=m.roomId||`${m.userPhone}_${m.productId}`;(rooms[key]??=[]).push(m)}});Object.values(rooms).forEach(a=>a.sort((x,y)=>new Date(x.createdAt||0)-new Date(y.createdAt||0)));renderAll()}))}
+function myProducts(){return products.filter(p=>String(p.sellerId)===String(currentSeller.sellerId))}
+function myOrders(){return orders.filter(o=>(o.items||[]).some(i=>String(i.sellerId||'')===String(currentSeller.sellerId)))}
+function renderAll(){if(!currentSeller)return;const mp=myProducts(),mo=myOrders();$('nbSellerStatProducts').textContent=mp.length;$('nbSellerStatOrders').textContent=mo.length;$('nbSellerStatPending').textContent=mo.filter(o=>!['Completed','Rejected'].includes(o.status)).length;$('nbSellerStatUnread').textContent=notifications.filter(n=>!n.read).length;renderProducts(mp);renderOrders(mo);renderChats();renderNotifications();renderProfile()}
+function renderProducts(mp){$('nbSellerTab-products').innerHTML=`<div class="panel-head"><h2>My Products</h2><button class="btn btn-primary btn-small" onclick="openProductModal()"><i class="fas fa-plus"></i> Add Product</button></div>${mp.length?`<div class="product-grid">${mp.map(p=>`<div class="product"><img src="${escapeHtml(p.image||'')}" alt="Product"><div class="product-body"><h3>${escapeHtml(p.name)}</h3><div class="price">₦${Number(p.price||0).toLocaleString()}</div><div class="meta">${escapeHtml(p.category||'Other')} · ${Number(p.sales||0)} sales</div><div class="actions"><button class="btn btn-light btn-small" onclick="editProduct('${p.firestoreId}')"><i class="fas fa-pen"></i> Edit</button><button class="btn btn-danger btn-small" onclick="removeProduct('${p.firestoreId}')"><i class="fas fa-trash"></i> Delete</button></div></div></div>`).join('')}</div>`:'<div class="empty"><i class="fas fa-box-open" style="font-size:34px"></i><p>No products yet. Add your first product.</p></div>'}`}
+function renderOrders(mo){const sorted=[...mo].sort((a,b)=>new Date(b.createdAt||b.date||0)-new Date(a.createdAt||a.date||0));$('nbSellerTab-orders').innerHTML=`<div class="panel-head"><h2>My Orders</h2><span class="meta">Only orders containing your products</span></div>${sorted.length?sorted.map(o=>{const items=(o.items||[]).filter(i=>String(i.sellerId||'')===String(currentSeller.sellerId));return `<div class="order"><div class="order-top"><div><div class="order-id">#${escapeHtml(o.id||o.firestoreId)}</div><div class="meta">${escapeHtml(o.userName||'Customer')} · ${escapeHtml(o.userPhone||o.phone||'')} · ${o.createdAt?new Date(o.createdAt).toLocaleString():escapeHtml(o.date||'')}</div></div><span class="badge">${escapeHtml(o.status||'Placed')}</span></div><div class="order-items">${items.map(i=>`<div class="order-item"><span>${escapeHtml(i.name||'Product')} × ${Number(i.quantity||1)}</span><strong>₦${Number(i.price||0).toLocaleString()}</strong></div>`).join('')}</div><div class="actions"><select id="nbSellerStatus-${o.firestoreId}" style="border:1px solid var(--border);border-radius:10px;padding:8px;font-size:11px"><option>Placed</option><option>Uploaded</option><option>Confirmed</option><option>Preparing</option><option>Shipped</option><option>Ready for Pickup</option><option>Completed</option><option>Rejected</option></select><button class="btn btn-primary btn-small" onclick="updateOrderStatus('${o.firestoreId}')">Update Status</button></div></div>`}).join(''):'<div class="empty">No orders for your products yet.</div>'}`;sorted.forEach(o=>{const el=$(`nbSellerStatus-${o.firestoreId}`);if(el)el.value=o.status||'Placed'})}
+function renderChats(){const keys=Object.keys(rooms);$('nbSellerTab-chats').innerHTML=`<div class="panel-head"><h2>Buyer Chats</h2><span class="meta">Real-time seller replies</span></div>${keys.length?`<div class="chat-layout"><div class="rooms">${keys.map(k=>{const a=rooms[k],f=a[0]||{};return `<div class="room ${activeRoom===k?'active':''}" onclick="selectRoom('${encodeURIComponent(k)}')"><strong>${escapeHtml(f.productName||'Product chat')}</strong><small>${escapeHtml(f.userName||'Customer')} · ${escapeHtml(f.userPhone||'')}</small></div>`}).join('')}</div><div class="chat-box">${renderActiveRoom()}</div></div>`:'<div class="empty"><i class="far fa-comment-dots" style="font-size:34px"></i><p>No buyer chats yet.</p></div>'}`}
+function renderActiveRoom(){if(!activeRoom&&Object.keys(rooms).length)activeRoom=Object.keys(rooms)[0];const a=rooms[activeRoom]||[];const f=a[0]||{};return `<div class="chat-head">${escapeHtml(f.productName||'Select a chat')} · ${escapeHtml(f.userName||'')}</div><div class="messages">${a.length?a.map(m=>`<div class="msg ${m.senderRole==='seller'?'mine':''}"><strong>${m.senderRole==='seller'?'You':escapeHtml(m.userName||'Buyer')}</strong><div>${escapeHtml(m.message||'')}</div><small>${m.createdAt?new Date(m.createdAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):''}</small></div>`).join(''):'<div class="empty">No messages yet.</div>'}</div><div class="chat-send"><input id="sellerChatInput" placeholder="Reply to buyer..." onkeydown="if(event.key==='Enter')sendSellerMessage()"><button class="btn btn-primary btn-small" onclick="sendSellerMessage()"><i class="fas fa-paper-plane"></i></button></div>`}
+window.selectRoom=function(encoded){activeRoom=decodeURIComponent(encoded);renderChats()}
+window.sendSellerMessage=async function(){const input=$('sellerChatInput');const message=input?.value.trim();if(!message||!activeRoom)return;const a=rooms[activeRoom]||[];const first=a[0]||{};try{await addDoc(collection(db,'chats'),{roomId:activeRoom,productId:first.productId,productName:first.productName,userPhone:first.userPhone,userName:first.userName,sellerId:currentSeller.sellerId,senderRole:'seller',message,createdAt:new Date().toISOString()});input.value='';await addDoc(collection(db,'notifications'),{userPhone:normPhone(first.userPhone),title:'New seller message',message:`${currentSeller.business||currentSeller.name} replied to your chat about ${first.productName||'your product'}.`,type:'chat',read:false,createdAt:new Date().toISOString()})}catch(e){console.error(e);toast('Unable to send message')}}
+function renderNotifications(){const arr=notifications; $('nbSellerTab-notifications').innerHTML=`<div class="panel-head"><h2>Seller Notifications</h2><button class="btn btn-light btn-small" onclick="markAllRead()">Mark all read</button></div>${arr.length?arr.map(n=>`<div class="notice ${n.read?'':'unread'}"><h3>${escapeHtml(n.title||'NEARBUY Update')}</h3><p>${escapeHtml(n.message||'')}</p><small>${n.createdAt?new Date(n.createdAt).toLocaleString():''}</small></div>`).join(''):'<div class="empty">No seller notifications yet.</div>'}`}
+window.markAllRead=async function(){for(const n of notifications.filter(x=>!x.read&&x.firestoreId)){try{await updateDoc(doc(db,'notifications',n.firestoreId),{read:true})}catch(e){}}toast('Notifications marked as read')}
+function renderProfile(){const s=currentSeller;const photo=s.photo?`<img class="seller-photo" src="${escapeHtml(s.photo)}" alt="Seller profile">`:`<div class="seller-photo-empty"><i class="fas fa-store"></i></div>`;$('nbSellerTab-profile').innerHTML=`<div class="panel-head"><h2>Seller Profile</h2><button class="btn btn-primary btn-small" onclick="editProfile()">Edit Profile</button></div><div class="profile-grid"><div>${photo}</div><div><div class="field"><label>Name</label><input value="${escapeHtml(s.name||'')}" disabled></div><div class="field"><label>Business</label><input value="${escapeHtml(s.business||'')}" disabled></div><div class="field"><label>Phone</label><input value="${escapeHtml(s.phone||'')}" disabled></div><div class="field"><label>Email</label><input value="${escapeHtml(s.email||'')}" disabled></div><div class="field"><label>Location</label><input value="${escapeHtml(s.location||'')}" disabled></div><div class="field"><label>Seller ID</label><input value="${escapeHtml(s.sellerId||'')}" disabled></div></div></div>`}
+window.editProfile=function(){const s=currentSeller; $('nbSellerTab-profile').innerHTML=`<div class="panel-head"><h2>Edit Seller Profile</h2></div><div class="field"><label>Name</label><input id="profileName" value="${escapeHtml(s.name||'')}"></div><div class="field"><label>Business</label><input id="profileBusiness" value="${escapeHtml(s.business||'')}"></div><div class="field"><label>Email</label><input id="profileEmail" value="${escapeHtml(s.email||'')}"></div><div class="field"><label>Location</label><input id="profileLocation" value="${escapeHtml(s.location||'')}"></div><div class="field"><label>New Profile Photo (optional)</label><input id="profilePhoto" type="file" accept="image/*"></div><div class="actions"><button class="btn btn-light" onclick="renderProfile()">Cancel</button><button class="btn btn-primary" onclick="saveProfile()">Save Changes</button></div>`}
+window.saveProfile=async function(){try{const data={name:$('profileName').value.trim(),business:$('profileBusiness').value.trim(),email:$('profileEmail').value.trim(),location:$('profileLocation').value.trim()};const file=$('profilePhoto').files[0];if(file)data.photo=await compressImage(file);await updateDoc(doc(db,'sellers',currentSeller.firestoreId),data);Object.assign(currentSeller,data);toast('Profile updated successfully');renderProfile();}catch(e){console.error(e);toast('Profile could not be updated')}}
+function compressImage(file,max=900,q=.78){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const scale=Math.min(1,max/Math.max(img.width,img.height));const c=document.createElement('canvas');c.width=Math.round(img.width*scale);c.height=Math.round(img.height*scale);c.getContext('2d').drawImage(img,0,0,c.width,c.height);resolve(c.toDataURL('image/jpeg',q))};img.onerror=reject;img.src=r.result};r.onerror=reject;r.readAsDataURL(file)})}
+window.openProductModal=function(product=null){$('nbSellerProductModal').classList.add('open');$('nbSellerEditProductId').value=product?.firestoreId||'';$('nbSellerProductModalTitle').textContent=product?'Edit Product':'Add Product';$('nbSellerProductName').value=product?.name||'';$('nbSellerProductPrice').value=product?.price||'';$('nbSellerProductCategory').value=product?.category||'Other';$('nbSellerProductImage').value='';$('nbSellerProductPreview').src=product?.image||'';$('nbSellerProductPreview').style.display=product?.image?'block':'none'}
+window.closeProductModal=function(){$('nbSellerProductModal').classList.remove('open')}
+window.editProduct=function(id){const p=products.find(x=>x.firestoreId===id&&String(x.sellerId)===String(currentSeller.sellerId));if(p)openProductModal(p)}
+window.saveProduct=async function(){const id=$('nbSellerEditProductId').value,name=$('nbSellerProductName').value.trim(),price=Number($('nbSellerProductPrice').value),category=$('nbSellerProductCategory').value,file=$('nbSellerProductImage').files[0];if(!name||!price||price<=0){toast('Enter a valid product name and price');return}try{let image='';if(id){const p=products.find(x=>x.firestoreId===id);image=p?.image||''}if(file){if(!file.type.startsWith('image/')){toast('Please select a valid image');return}image=await compressImage(file)}if(!image){toast('Please select a product image');return}const data={name,price,category,image,sellerId:currentSeller.sellerId,sellerName:currentSeller.name||'NEARBUY Seller',sellerPhone:currentSeller.phone||''};if(id)await updateDoc(doc(db,'products',id),data);else await addDoc(collection(db,'products'),{...data,id:Date.now(),sales:0,createdAt:new Date().toISOString()});closeProductModal();toast(id?'Product updated successfully':'Product added successfully')}catch(e){console.error(e);toast('Product could not be saved')}}
+window.removeProduct=async function(id){const p=products.find(x=>x.firestoreId===id&&String(x.sellerId)===String(currentSeller.sellerId));if(!p)return;if(!confirm(`Delete "${p.name}"?`))return;try{await deleteDoc(doc(db,'products',id));toast('Product deleted')}catch(e){console.error(e);toast('Product could not be deleted')}}
+window.updateOrderStatus=async function(id){const o=orders.find(x=>x.firestoreId===id);if(!o)return;const status=$(`nbSellerStatus-${id}`).value;try{await updateDoc(doc(db,'orders',id),{status});const buyerPhone=normPhone(o.userPhone||o.phone);await addDoc(collection(db,'notifications'),{userPhone:buyerPhone,title:status==='Ready for Pickup'?'Order ready for pickup':'Order update',message:`Your order #${o.id||id} is now ${status}.`,type:'order',read:false,createdAt:new Date().toISOString()});toast('Order status updated')}catch(e){console.error(e);toast('Order status could not be updated')}}
+window.showTab=function(tab){document.querySelectorAll('.tab-panel').forEach(x=>x.style.display='none');$(`tab-${tab}`).style.display='block';document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===tab));if(tab==='chats')renderChats();if(tab==='notifications')markAllRead()}
+window.sellerLogout=function(){clearListeners();sessionStorage.removeItem('nearbuySellerId');currentSeller=null;products=[];orders=[];notifications=[];rooms={};activeRoom='';$('nbSellerDashboardScreen').classList.remove('active');$('nbSellerLoginScreen').classList.add('active');$('nbSellerLogoutTop').style.display='none';['nbSellerPin1','nbSellerPin2','nbSellerPin3','nbSellerPin4'].forEach(id=>$(id).value='');toast('Signed out successfully')}
+window.goHome=function(){showPage('home')}
+function renderInitialSession(){const sid=sessionStorage.getItem('nearbuySellerId');if(sid&&currentSeller&&String(sid)===String(currentSeller.sellerId))showDashboard()}
+['nbSellerPin1','nbSellerPin2','nbSellerPin3','nbSellerPin4'].forEach((id,i)=>$(id).addEventListener('input',e=>{e.target.value=e.target.value.replace(/\D/g,'').slice(0,1);if(e.target.value&&i<3)$(`pin${i+2}`).focus()}));document.addEventListener('keydown',e=>{if(e.key==='Backspace'&&document.activeElement?.id?.startsWith('nbSellerPin')){const i=Number(document.activeElement.id.replace('nbSellerPin',''));if(!$(document.activeElement.id).value&&i>1)$(`pin${i-1}`).focus()}});
+window.previewImage=function(e){const f=e.target.files[0],img=$('nbSellerProductPreview');if(!f){img.style.display='none';return}if(!f.type.startsWith('image/')){toast('Please select an image');e.target.value='';return}const r=new FileReader();r.onload=()=>{img.src=r.result;img.style.display='block'};r.readAsDataURL(f)}
+if (urlSellerId) {
+  loadSeller().then(()=>{const sid=sessionStorage.getItem('nearbuySellerId');if(sid&&currentSeller&&String(sid)===String(currentSeller.sellerId))showDashboard()}).catch(e=>{console.error(e);$('nbSellerLoginError').textContent='Unable to load seller account. Check Firestore rules.';$('nbSellerLoginError').style.display='block'});
+}
+
+window.openSellerPage = function(){ showPage('seller'); };
+
+</script>
+
+<script>
+(function(){
+  try {
+    const sid=new URLSearchParams(window.location.search).get('sellerId');
+    if(sid){
+      const go=function(){ if(typeof window.showPage==='function'){ window.showPage('seller'); } else { setTimeout(go,50); } };
+      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',go); else go();
+    }
+  } catch(e){ console.error('NEARBUY seller route error',e); }
+})();
+</script>
 </body>
 </html>
+<style id="nearbuy-profile-visibility-final">#page-profile{display:none !important;}#page-profile.active{display:flex !important;}</style>
