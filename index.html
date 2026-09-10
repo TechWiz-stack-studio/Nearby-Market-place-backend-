@@ -2401,6 +2401,7 @@ window.nearbuyStartTracking =
 
         <!-- SIGN UP -->
         <section id="nbProfileSignup" class="screen">
+            <div class="nb-profile-card">
             <div class="top-row">
                 <button class="back-btn" type="button" onclick="nbProfileGoHome()" aria-label="Go back">
                     <i class="fas fa-arrow-left"></i>
@@ -2436,10 +2437,13 @@ window.nearbuyStartTracking =
             <button class="text-link" type="button" onclick="nbProfileShowLoginPhone()">
                 I already have an account
             </button>
+        
+            </div>
         </section>
 
         <!-- CREATE PIN -->
         <section id="nbProfileCreatePin" class="screen hidden">
+            <div class="nb-profile-card">
             <div class="top-row">
                 <button class="back-btn" type="button" onclick="nbProfileShowSignup()" aria-label="Go back">
                     <i class="fas fa-arrow-left"></i>
@@ -2466,10 +2470,13 @@ window.nearbuyStartTracking =
             <div id="nbProfileCreateDots" class="pin-dots"></div>
             <div id="nbProfileCreateKeypad" class="keypad"></div>
             <p class="helper">You can also use your keyboard.</p>
+        
+            </div>
         </section>
 
         <!-- LOGIN PHONE -->
         <section id="nbProfileLoginPhoneScreen" class="screen hidden">
+            <div class="nb-profile-card">
             <div class="top-row">
                 <button class="back-btn" type="button" onclick="nbProfileShowSignup()" aria-label="Go back">
                     <i class="fas fa-arrow-left"></i>
@@ -2499,10 +2506,13 @@ window.nearbuyStartTracking =
             <button class="text-link" type="button" onclick="nbProfileShowSignup()">
                 New here? Create an account
             </button>
+        
+            </div>
         </section>
 
         <!-- LOGIN PIN -->
         <section id="nbProfileLoginPin" class="screen hidden">
+            <div class="nb-profile-card">
             <div class="top-row">
                 <button class="back-btn" type="button" onclick="nbProfileShowLoginPhone()" aria-label="Go back">
                     <i class="fas fa-arrow-left"></i>
@@ -2529,10 +2539,13 @@ window.nearbuyStartTracking =
             <div id="nbProfileLoginDots" class="pin-dots"></div>
             <div id="nbProfileLoginKeypad" class="keypad"></div>
             <p class="helper">You can also use your keyboard.</p>
+        
+            </div>
         </section>
 
         <!-- ACCOUNT -->
         <section id="nbProfileAccount" class="screen hidden">
+            <div class="nb-profile-card">
             <div class="top-row">
                 <button class="back-btn" type="button" onclick="nbProfileGoHome()" aria-label="Go back">
                     <i class="fas fa-arrow-left"></i>
@@ -2574,6 +2587,8 @@ window.nearbuyStartTracking =
                     <button class="secondary-btn" type="button" onclick="nbProfileGoToOrders()">View My Orders</button>
                     <button class="danger-btn" type="button" onclick="nbProfileLogout()">Sign Out</button>
                 </div>
+            </div>
+        
             </div>
         </section>
 
@@ -4028,9 +4043,9 @@ function renderProducts(filter = 'All') {
         // CART
         // ============================================================
         function addToCart(id) {
-            const p = products.find(x => x.id === id);
+            const p = products.find(x => String(x.id) === String(id));
             if (!p) return;
-            const existing = cart.find(x => x.id === id);
+            const existing = cart.find(x => String(x.id) === String(id));
             if (existing) {
                 existing.qty += 1;
             } else {
@@ -4041,12 +4056,12 @@ function renderProducts(filter = 'All') {
         }
 
         function removeFromCart(id) {
-            cart = cart.filter(x => x.id !== id);
+            cart = cart.filter(x => String(x.id) !== String(id));
             updateCartUI();
         }
 
         function updateQty(id, delta) {
-            const item = cart.find(x => x.id === id);
+            const item = cart.find(x => String(x.id) === String(id));
             if (!item) return;
             item.qty += delta;
             if (item.qty <= 0) {
