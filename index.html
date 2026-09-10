@@ -4043,9 +4043,9 @@ function renderProducts(filter = 'All') {
         // CART
         // ============================================================
         function addToCart(id) {
-            const p = products.find(x => x.id === id);
+            const p = products.find(x => String(x.id) === String(id));
             if (!p) return;
-            const existing = cart.find(x => x.id === id);
+            const existing = cart.find(x => String(x.id) === String(id));
             if (existing) {
                 existing.qty += 1;
             } else {
@@ -4056,12 +4056,12 @@ function renderProducts(filter = 'All') {
         }
 
         function removeFromCart(id) {
-            cart = cart.filter(x => x.id !== id);
+            cart = cart.filter(x => String(x.id) !== String(id));
             updateCartUI();
         }
 
         function updateQty(id, delta) {
-            const item = cart.find(x => x.id === id);
+            const item = cart.find(x => String(x.id) === String(id));
             if (!item) return;
             item.qty += delta;
             if (item.qty <= 0) {
