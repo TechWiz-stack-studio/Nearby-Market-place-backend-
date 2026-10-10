@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEARBUY Seller Dashboard</title>
+<meta http-equiv="refresh" content="0; url=index.html">
+<script>
+(function () {
+  var target = new URL('index.html', window.location.href);
+  var params = new URLSearchParams(window.location.search);
+  if (params.has('sellerId')) target.searchParams.set('sellerId', params.get('sellerId'));
+  window.location.replace(target.toString());
+})();
+</script>
+</head>
+<body style="font-family:Arial,sans-serif;padding:24px;color:#1d2528">
+<p>Opening the NEARBUY seller dashboard…</p>
+<p><a href="index.html">Continue to NEARBUY</a></p>
+</body>
+</html>

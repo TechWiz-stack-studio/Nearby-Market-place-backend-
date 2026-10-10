@@ -1,0 +1,51 @@
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/api/paystack-initialize"
+  to = "/.netlify/functions/paystack-initialize"
+  status = 200
+
+[[redirects]]
+  from = "/api/paystack-verify"
+  to = "/.netlify/functions/paystack-verify"
+  status = 200
+
+[[redirects]]
+  from = "/api/paystack-webhook"
+  to = "/.netlify/functions/paystack-webhook"
+  status = 200
+
+[[redirects]]
+  from = "/api/wallet-summary"
+  to = "/.netlify/functions/wallet-summary"
+  status = 200
+
+[[redirects]]
+  from = "/api/wallet-bank-save"
+  to = "/.netlify/functions/wallet-bank-save"
+  status = 200
+
+[[redirects]]
+  from = "/api/wallet-withdrawal-request"
+  to = "/.netlify/functions/wallet-withdrawal-request"
+  status = 200
+
+[[redirects]]
+  from = "/api/wallet-admin-release"
+  to = "/.netlify/functions/wallet-admin-release"
+  status = 200
+
+[[redirects]]
+  from = "/api/wallet-admin-process-withdrawal"
+  to = "/.netlify/functions/wallet-admin-process-withdrawal"
+  status = 200
+
+[[redirects]]
+  from = "/api/wallet-admin-list-withdrawals"
+  to = "/.netlify/functions/wallet-admin-list-withdrawals"
+  status = 200

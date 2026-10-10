@@ -1,0 +1,13 @@
+# Route API requests to Netlify Functions BEFORE the SPA fallback.
+/api/paystack-initialize  /.netlify/functions/paystack-initialize  200
+/api/paystack-verify  /.netlify/functions/paystack-verify  200
+/api/paystack-webhook  /.netlify/functions/paystack-webhook  200
+/api/wallet-summary  /.netlify/functions/wallet-summary  200
+/api/wallet-bank-save  /.netlify/functions/wallet-bank-save  200
+/api/wallet-withdrawal-request  /.netlify/functions/wallet-withdrawal-request  200
+/api/wallet-admin-release  /.netlify/functions/wallet-admin-release  200
+/api/wallet-admin-process-withdrawal  /.netlify/functions/wallet-admin-process-withdrawal  200
+/api/wallet-admin-list-withdrawals  /.netlify/functions/wallet-admin-list-withdrawals  200
+
+# Single-page app fallback must come AFTER all API routes.
+/*  /index.html  200
